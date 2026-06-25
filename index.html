@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consumo Diario Telemedido - EDEs</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f8fafc;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            height: 6px;
+            width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+    </style>
+</head>
+<body class="flex justify-center items-center min-h-screen p-0 sm:p-4">
+
+    <div class="w-full max-w-md bg-white min-h-screen sm:min-h-[880px] sm:rounded-3xl sm:shadow-2xl overflow-hidden flex flex-col justify-between border border-slate-150 relative">
+        
+        <!-- HEADER -->
+        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-md relative">
+            <div class="flex justify-between items-center mb-3">
+                <button class="p-1 hover:bg-white/10 rounded-full transition-colors" onclick="resetearApp()" title="Resetear de fábrica">
+                    <i data-lucide="refresh-cw" class="w-5 h-5"></i>
+                </button>
+                <h1 class="text-lg font-bold tracking-tight">Consumo Telemedido RD</h1>
+                <div class="bg-white/20 text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Respaldo Activo
+                </div>
+            </div>
+
+            <div class="mt-4">
+                <label class="block text-xs uppercase tracking-wider text-cyan-100 font-bold mb-1.5">Distribuidora Eléctrica</label>
+                <div class="grid grid-cols-3 gap-2 bg-black/15 p-1 rounded-xl">
+                    <button id="ede-edenorte" onclick="cambiarEde('edenorte')" class="py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm">
+                        EDENORTE
+                    </button>
+                    <button id="ede-edesur" onclick="cambiarEde('edesur')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
+                        EDESUR
+                    </button>
+                    <button id="ede-edeeste" onclick="cambiarEde('edeeste')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
+                        EDEESTE
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- CONTENIDO PRINCIPAL -->
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar">
+            
+            <!-- ALERTA POR EXCESO -->
+            <div id="alerta-exceso" class="hidden bg-rose-50 border border-rose-300 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs">
+                <div class="bg-rose-100 p-2 rounded-xl text-rose-750">
+                    <i data-lucide="alert-octagon" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm">¡Límite de 700 kWh Superado!</h3>
+                    <p class="text-xs text-rose-700 mt-1">Has entrado en tarifa monobloque. Todo tu consumo se calculará a tasa plana.</p>
+                </div>
+            </div>
+
+            <!-- TARJETA GLOBAL -->
+            <div class="bg-gradient-to-br from-slate-900 to-slate-800 text-white rounded-2xl p-5 shadow-lg relative overflow-hidden">
+                <div class="absolute -right-8 -bottom-8 text-white/5 pointer-events-none">
+                    <i data-lucide="zap" class="w-32 h-32"></i>
+                </div>
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-xs text-slate-400 font-medium">Ciclo de Facturación Actual</p>
+                        <h4 class="text-sm font-semibold text-sky-400 mt-0.5" id="rango-ciclo">Detectando ciclo...</h4>
+                    </div>
+                    <span class="text-xs font-mono text-slate-400 bg-slate-800/80 px-2 py-1 rounded-md">Serial: 76601965</span>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="border-r border-slate-700/60 pr-2">
+                        <p class="text-xs text-slate-400">Consumo Acumulado</p>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-2xl font-extrabold text-white" id="total-kwh">0.00</span>
+                            <span class="text-xs font-bold text-cyan-400">kWh</span>
+                        </div>
+                    </div>
+                    <div class="pl-2">
+                        <p class="text-xs text-slate-400">Monto Estimado</p>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-2xl font-extrabold text-emerald-400" id="total-pesos">RD$ 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Progreso -->
+                <div class="mt-4 pt-4 border-t border-slate-700/60">
+                    <div class="flex justify-between text-xs mb-1.5">
+                        <span class="text-slate-400">Progreso a Monobloque (>700 kWh)</span>
+                        <span class="font-bold text-slate-300" id="progreso-texto">0 / 700 kWh</span>
+                    </div>
+                    <div class="w-full bg-slate-700 bg-opacity-50 h-2.5 rounded-full overflow-hidden flex">
+                        <div id="progreso-barra-verde" class="bg-emerald-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="progreso-barra-amarilla" class="bg-amber-500 h-full transition-all duration-500" style="width: 0%"></div>
+                        <div id="progreso-barra-roja" class="bg-rose-500 h-full transition-all duration-500" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GRÁFICO DIARIO -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-xs">
+                <div class="flex justify-between items-center mb-3">
+                    <div>
+                        <h3 class="text-sm font-bold text-slate-800">Consumo Diario (kWh)</h3>
+                        <p class="text-[11px] text-slate-500">Desliza para ver todo el historial</p>
+                    </div>
+                    <select id="filtro-lecturas" onchange="renderizarApp()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg py-1 px-2 focus:ring-1 focus:ring-sky-500">
+                        <option value="todos">Mostrar Todo</option>
+                        <option value="con-datos">Omitir errores</option>
+                    </select>
+                </div>
+
+                <div class="overflow-x-auto pb-2 custom-scrollbar">
+                    <div class="min-w-[480px] pt-4 pr-2">
+                        <div class="h-44 flex items-end justify-between gap-2.5 border-b border-slate-100 relative" id="grafica-barras"></div>
+                        <div class="flex justify-between pt-2 text-[10px] font-semibold text-slate-400 tracking-tighter" id="grafica-fechas"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TALONARIO DE ESTADÍSTICAS -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-xs space-y-3">
+                <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
+                    <div class="bg-indigo-50 text-indigo-600 p-1.5 rounded-lg">
+                        <i data-lucide="trending-up" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800">Talonario de Estadísticas</h3>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100/50">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Proyectado Mensual</p>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-base font-extrabold text-indigo-600" id="stat-proyeccion">0.00</span>
+                            <span class="text-[10px] font-bold text-slate-500">kWh</span>
+                        </div>
+                    </div>
+                    <div class="bg-slate-50 p-3 rounded-xl border border-slate-100/50">
+                        <p class="text-[10px] text-slate-400 font-bold uppercase">Promedio Diario</p>
+                        <div class="flex items-baseline gap-1 mt-1">
+                            <span class="text-base font-extrabold text-slate-700" id="stat-promedio">0.00</span>
+                            <span class="text-[10px] font-bold text-slate-500">kWh</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- REGISTRAR LECTURA -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-xs space-y-3">
+                <div class="flex items-center gap-2 mb-1">
+                    <div class="bg-sky-50 text-sky-600 p-1.5 rounded-lg">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i>
+                    </div>
+                    <h3 class="text-sm font-bold text-slate-800">Registrar Nueva Lectura</h3>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-medium mb-1">Fecha</label>
+                        <input type="date" id="input-fecha" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-sky-500">
+                    </div>
+                    <div>
+                        <label class="block text-[11px] text-slate-500 font-medium mb-1">Cantidad (kWh)</label>
+                        <input type="number" id="input-kwh" step="0.01" placeholder="Ej: 12.4" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-sky-500">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-2 gap-2">
+                    <button onclick="agregarConsumo()" class="bg-sky-500 text-white py-2 rounded-xl font-bold text-xs shadow-md shadow-sky-100 hover:opacity-95 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
+                        <i data-lucide="save" class="w-3.5 h-3.5"></i> Guardar Día
+                    </button>
+                    <button onclick="marcarErrorLectura()" class="bg-slate-100 text-slate-600 py-2 rounded-xl font-bold text-xs hover:bg-slate-200 transition-all flex items-center justify-center gap-1.5">
+                        <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i> Marcar Error
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABLA DE LECTURAS -->
+            <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-xs">
+                <div class="flex justify-between items-center mb-3">
+                    <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo Actual</h3>
+                    <button onclick="limpiarRegistrosPantalla()" class="text-xs text-amber-600 hover:underline flex items-center gap-1 font-medium" title="Limpia la pantalla pero conserva tu copia en 'Cargar Datos'">
+                        <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpiar Pantalla
+                    </button>
+                </div>
+
+                <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                    <table class="w-full text-left text-xs text-slate-600">
+                        <thead class="sticky top-0 bg-white">
+                            <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-150">
+                                <th class="py-2 px-3 rounded-l-lg">Fecha</th>
+                                <th class="py-2 px-3 text-right">Consumo</th>
+                                <th class="py-2 px-3 text-right">Costo Acum.</th>
+                                <th class="py-2 px-3 text-center rounded-r-lg">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-registros" class="divide-y divide-slate-50"></tbody>
+                    </table>
+                    <div id="tabla-vacia" class="text-center py-8 text-slate-400 text-xs hidden">No hay lecturas en pantalla. Presiona abajo 'Cargar Datos' para restaurar tu historial seguro.</div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- BARRA INFERIOR -->
+        <footer class="bg-white border-t border-slate-100 py-3 px-6 flex justify-around items-center text-xs text-slate-400 font-medium">
+            <button class="flex flex-col items-center gap-1 text-sky-500">
+                <i data-lucide="layout-dashboard" class="w-5 h-5"></i>
+                <span>Consumo</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 hover:text-slate-600" onclick="mostrarModalDetalleTarifa()">
+                <i data-lucide="calculator" class="w-5 h-5"></i>
+                <span>Calculadora</span>
+            </button>
+            <button class="flex flex-col items-center gap-1 hover:text-slate-600 relative" onclick="abrirModalConfig()">
+                <i data-lucide="database" class="w-5 h-5"></i>
+                <span>Cargar Datos</span>
+                <span id="badge-guardados" class="absolute -top-1 -right-2 bg-emerald-500 text-white text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+            </button>
+        </footer>
+
+    </div>
+
+    <!-- MODAL: PANEL DE CONTROL Y CARGA DE RESPALDOS -->
+    <div id="modal-config" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="database" class="text-emerald-500"></i> Historial de Respaldos
+                </h3>
+                <button onclick="cerrarModalConfig()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            
+            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs space-y-2">
+                <div class="flex justify-between"><span>Estado del Respaldo:</span><span class="text-emerald-600 font-bold flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Actualizado</span></div>
+                <div class="flex justify-between"><span>Lecturas en tu copia de seguridad:</span><strong id="modal-count-backup" class="text-slate-800">0 días</strong></div>
+                <p class="text-[11px] text-slate-400 mt-1 leading-tight">Cada vez que guardas un día, se añade automáticamente a esta copia de seguridad permanente.</p>
+            </div>
+
+            <div class="space-y-2 pt-2">
+                <button onclick="recuperarHistorialCompleto()" class="w-full bg-emerald-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-md shadow-emerald-100 flex items-center justify-center gap-1.5">
+                    <i data-lucide="download-cloud" class="w-4 h-4"></i> Cargar Historial Completo
+                </button>
+                <button onclick="cargarHistorialFabrica()" class="w-full bg-slate-100 text-slate-600 py-2 rounded-xl text-[11px] font-medium hover:bg-slate-200 transition-colors">
+                    Restaurar sólo datos de las Fotos (17 días)
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DETALLE CALCULADORA -->
+    <div id="modal-detalle" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl">
+            <div class="flex justify-between items-center">
+                <h3 class="text-base font-bold text-slate-800 flex items-center gap-2">
+                    <i data-lucide="calculator" class="text-emerald-500"></i> Cálculo Tarifario Exacto
+                </h3>
+                <button onclick="cerrarModalDetalle()" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="detalle-calculo-contenido" class="space-y-2 text-xs"></div>
+            <button onclick="cerrarModalDetalle()" class="w-full bg-slate-900 text-white py-2 rounded-xl text-xs font-bold hover:bg-slate-800 transition-colors">Cerrar Detalle</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const tarifasEde = {
+            edenorte: { nombre: 'EDENORTE', cargoFijo: 126.81, rango1: 5.97, rango2: 8.51, rango3: 13.83, monobloque: 14.04 },
+            edesur: { nombre: 'EDESUR', cargoFijo: 127.15, rango1: 6.05, rango2: 8.62, rango3: 14.01, monobloque: 14.22 },
+            edeeste: { nombre: 'EDEESTE', cargoFijo: 126.95, rango1: 5.99, rango2: 8.55, rango3: 13.92, monobloque: 14.10 }
+        };
+
+        let edeSeleccionada = 'edenorte';
+        let lecturas = [];
+
+        window.onload = function() {
+            const hoy = new Date();
+            document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
+            
+            const savedLecturas = localStorage.getItem('lecturas_ciclo_actual');
+            const savedEde = localStorage.getItem('ede_seleccionada_v4');
+            
+            // Si nunca se ha iniciado la app, pre-cargamos los 17 días de las fotos como el primer respaldo histórico
+            if (!localStorage.getItem('copia_seguridad_historial')) {
+                const historialBaseInicial = [
+                    { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
+                    { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
+                    { fecha: '2026-06-06', kwh: 9.09, esFallo: false },
+                    { fecha: '2026-06-07', kwh: 8.51, esFallo: false },
+                    { fecha: '2026-06-08', kwh: 10.95, esFallo: false },
+                    { fecha: '2026-06-09', kwh: 14.44, esFallo: false },
+                    { fecha: '2026-06-10', kwh: 17.30, esFallo: false },
+                    { fecha: '2026-06-11', kwh: 10.41, esFallo: false },
+                    { fecha: '2026-06-12', kwh: 10.19, esFallo: false },
+                    { fecha: '2026-06-13', kwh: 10.47, esFallo: false },
+                    { fecha: '2026-06-14', kwh: 16.04, esFallo: false },
+                    { fecha: '2026-06-15', kwh: 0.00, esFallo: true }, 
+                    { fecha: '2026-06-16', kwh: 0.00, esFallo: true }, 
+                    { fecha: '2026-06-17', kwh: 13.56, esFallo: false },
+                    { fecha: '2026-06-18', kwh: 11.90, esFallo: false },
+                    { fecha: '2026-06-19', kwh: 16.22, esFallo: false },
+                    { fecha: '2026-06-20', kwh: 9.31, esFallo: false }
+                ];
+                localStorage.setItem('copia_seguridad_historial', JSON.stringify(historialBaseInicial));
+                lecturas = [...historialBaseInicial];
+                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            }
+
+            if (savedEde) edeSeleccionada = savedEde;
+            if (savedLecturas) lecturas = JSON.parse(savedLecturas);
+            
+            renderizarApp();
+        };
+
+        function abrirModalConfig() {
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            document.getElementById('modal-count-backup').innerText = `${backupActual.length} días guardados en total`;
+            document.getElementById('modal-config').classList.remove('hidden');
+        }
+
+        function cerrarModalConfig() {
+            document.getElementById('modal-config').classList.add('hidden');
+        }
+
+        // ACCIÓN DEL BOTÓN PRINCIPAL "Cargar Historial Completo"
+        function recuperarHistorialCompleto() {
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            if (backupActual.length === 0) {
+                mostrarAlertaRapida('No hay datos guardados en la copia.');
+                return;
+            }
+            lecturas = [...backupActual];
+            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            renderizarApp();
+            cerrarModalConfig();
+            mostrarAlertaRapida('¡Historial completo cargado con éxito!');
+        }
+
+        function cargarHistorialFabrica() {
+            if(confirm('¿Deseas sobreescribir tu copia actual con los 17 días iniciales de las fotos?')) {
+                const historialBase = [
+                    { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
+                    { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
+                    { fecha: '2026-06-06', kwh: 9.09, esFallo: false },
+                    { fecha: '2026-06-07', kwh: 8.51, esFallo: false },
+                    { fecha: '2026-06-08', kwh: 10.95, esFallo: false },
+                    { fecha: '2026-06-09', kwh: 14.44, esFallo: false },
+                    { fecha: '2026-06-10', kwh: 17.30, esFallo: false },
+                    { fecha: '2026-06-11', kwh: 10.41, esFallo: false },
+                    { fecha: '2026-06-12', kwh: 10.19, esFallo: false },
+                    { fecha: '2026-06-13', kwh: 10.47, esFallo: false },
+                    { fecha: '2026-06-14', kwh: 16.04, esFallo: false },
+                    { fecha: '2026-06-15', kwh: 0.00, esFallo: true }, 
+                    { fecha: '2026-06-16', kwh: 0.00, esFallo: true }, 
+                    { fecha: '2026-06-17', kwh: 13.56, esFallo: false },
+                    { fecha: '2026-06-18', kwh: 11.90, esFallo: false },
+                    { fecha: '2026-06-19', kwh: 16.22, esFallo: false },
+                    { fecha: '2026-06-20', kwh: 9.31, esFallo: false }
+                ];
+                localStorage.setItem('copia_seguridad_historial', JSON.stringify(historialBase));
+                lecturas = [...historialBase];
+                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                renderizarApp();
+                cerrarModalConfig();
+                mostrarAlertaRapida('Datos de fábrica restaurados.');
+            }
+        }
+
+        function cambiarEde(edeKey) {
+            edeSeleccionada = edeKey;
+            localStorage.setItem('ede_seleccionada_v4', edeKey);
+            renderizarApp();
+        }
+
+        // AUTO-GUARDADO DOBLE CADA VEZ QUE SE REGISTRA
+        function procesarGuardadoDoble(nuevaLectura) {
+            // 1. Actualizar el ciclo actual en pantalla
+            const idxCiclo = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxCiclo !== -1) lecturas[idxCiclo] = nuevaLectura;
+            else lecturas.push(nuevaLectura);
+            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+
+            // 2. ACTUALIZAR EL HISTORIAL COMPLETO DE "CARGAR DATOS"
+            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            const idxBackup = backupTotal.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxBackup !== -1) backupTotal[idxBackup] = nuevaLectura;
+            else backupTotal.push(nuevaLectura);
+            backupTotal.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
+
+            renderizarApp();
+        }
+
+        function agregarConsumo() {
+            const dateInput = document.getElementById('input-fecha').value;
+            const kwhInput = parseFloat(document.getElementById('input-kwh').value);
+
+            if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
+                mostrarAlertaRapida('Introduce valores correctos.');
+                return;
+            }
+
+            const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
+            procesarGuardadoDoble(item);
+            document.getElementById('input-kwh').value = '';
+            mostrarAlertaRapida('¡Guardado y respaldado!');
+        }
+
+        function marcarErrorLectura() {
+            const dateInput = document.getElementById('input-fecha').value;
+            if (!dateInput) return;
+
+            const item = { fecha: dateInput, kwh: 0, esFallo: true };
+            procesarGuardadoDoble(item);
+            mostrarAlertaRapida('Error registrado y respaldado.');
+        }
+
+        function eliminarRegistro(fecha) {
+            // Elimina de la vista actual
+            lecturas = lecturas.filter(l => l.fecha !== fecha);
+            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            
+            // También remueve de la copia de seguridad global
+            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            backupTotal = backupTotal.filter(l => l.fecha !== fecha);
+            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
+
+            renderizarApp();
+            mostrarAlertaRapida('Registro eliminado de raíz.');
+        }
+
+        // Permite vaciar la pantalla al cambiar de mes sin arruinar tu copia de seguridad global
+        function limpiarRegistrosPantalla() {
+            if (confirm('¿Quieres limpiar la pantalla? (Tu historial completo seguirá seguro en el botón de "Cargar Datos")')) {
+                lecturas = [];
+                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                renderizarApp();
+                mostrarAlertaRapida('Pantalla despejada.');
+            }
+        }
+
+        function resetearApp() {
+            if (confirm('¿Quieres borrar absolutamente todos los datos de fábrica? (Se borrará pantalla y copia de seguridad)')) {
+                localStorage.clear();
+                lecturas = [];
+                edeSeleccionada = 'edenorte';
+                renderizarApp();
+                mostrarAlertaRapida('Aplicación reiniciada por completo.');
+            }
+        }
+
+        function calcularFactura(totalKwh, edeKey) {
+            const tarifas = tarifasEde[edeKey];
+            const cargoFijo = tarifas.cargoFijo;
+            let desglose = [];
+            let costoTotal = cargoFijo;
+
+            if (totalKwh > 700) {
+                costoTotal = totalKwh * tarifas.monobloque + cargoFijo;
+                desglose.push({ rango: `Consumo Monobloque (>700 kWh)`, kwh: totalKwh, tasa: tarifas.monobloque, total: totalKwh * tarifas.monobloque });
+            } else {
+                let kwhRestante = totalKwh;
+                const b1 = Math.min(kwhRestante, 200);
+                if (b1 > 0) { costoti = b1 * tarifas.rango1; costoTotal += b1 * tarifas.rango1; desglose.push({ rango: 'Rango 0-200 kWh', kwh: b1, tasa: tarifas.rango1, total: b1 * tarifas.rango1 }); kwhRestante -= b1; }
+                const b2 = Math.min(kwhRestante, 100);
+                if (b2 > 0) { costoTotal += b2 * tarifas.rango2; desglose.push({ rango: 'Rango 201-300 kWh', kwh: b2, tasa: tarifas.rango2, total: b2 * tarifas.rango2 }); kwhRestante -= b2; }
+                const b3 = Math.min(kwhRestante, 400);
+                if (b3 > 0) { costoTotal += b3 * tarifas.rango3; desglose.push({ rango: 'Rango 301-700 kWh', kwh: b3, tasa: tarifas.rango3, total: b3 * tarifas.rango3 }); }
+            }
+            return { costoTotal, cargoFijo, desglose, excedeLimite: totalKwh > 700 };
+        }
+
+        function determinarCicloDeLectura(lista) {
+            if (lista.length === 0) return "Del 04/06 al 03/07";
+            const pr = new Date(lista[0].fecha + "T00:00:00");
+            const dia = pr.getDate(), mes = pr.getMonth(), anio = pr.getFullYear();
+            let inicio = dia >= 4 ? new Date(anio, mes, 4) : new Date(anio, mes - 1, 4);
+            let fin = dia >= 4 ? new Date(anio, mes + 1, 3) : new Date(anio, mes, 3);
+            const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+            return `Del ${fmt(inicio)} al ${fmt(fin)}`;
+        }
+
+        function renderizarApp() {
+            // Sincronizar botones de las EDEs
+            document.querySelectorAll('[id^="ede-"]').forEach(btn => {
+                btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10";
+            });
+            const activeBtn = document.getElementById(`ede-${edeSeleccionada}`);
+            if (activeBtn) activeBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm";
+
+            // Sincronizar el número total del Respaldo en el Badge inferior
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            document.getElementById('badge-guardados').innerText = backupActual.length;
+
+            const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
+            document.getElementById('total-kwh').innerText = totalKwh.toFixed(2);
+
+            const calculo = calcularFactura(totalKwh, edeSeleccionada);
+            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2 })}`;
+
+            document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-300 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs" : "hidden";
+
+            // Progreso gráfico
+            document.getElementById('progreso-texto').innerText = `${totalKwh.toFixed(1)} / 700 kWh`;
+            const bV = document.getElementById('progreso-barra-verde'), bA = document.getElementById('progreso-barra-amarilla'), bR = document.getElementById('progreso-barra-roja');
+            bV.style.width = bA.style.width = bR.style.width = '0%';
+            if (totalKwh <= 200) bV.style.width = `${(totalKwh / 700) * 100}%`;
+            else if (totalKwh <= 300) { bV.style.width = `${(200 / 700) * 100}%`; bA.style.width = `${((totalKwh - 200) / 700) * 100}%`; }
+            else { bV.style.width = `${(200 / 700) * 100}%`; bA.style.width = `${(100 / 700) * 100}%`; bR.style.width = `${(Math.min(totalKwh - 300, 400) / 700) * 100}%`; }
+
+            document.getElementById('rango-ciclo').innerText = determinarCicloDeLectura(lecturas);
+
+            // Filtrado gráfico
+            const filtro = document.getElementById('filtro-lecturas').value;
+            let paraGrafica = [...lecturas];
+            if (filtro === 'con-datos') paraGrafica = paraGrafica.filter(l => !l.esFallo);
+
+            // Estadísticas
+            const validos = lecturas.filter(l => !l.esFallo && l.kwh > 0);
+            const prom = validos.length > 0 ? (lecturas.reduce((acc, c) => acc + c.kwh, 0) / validos.length) : 0;
+            document.getElementById('stat-promedio').innerText = prom.toFixed(2);
+            document.getElementById('stat-proyeccion').innerText = (prom * 30).toFixed(2);
+
+            // Tabla visual
+            const tbody = document.getElementById('tabla-registros');
+            tbody.innerHTML = '';
+            document.getElementById('tabla-vacia').className = lecturas.length === 0 ? "text-center py-8 text-slate-400 text-xs" : "hidden";
+
+            let acumulado = 0;
+            lecturas.forEach(lec => {
+                acumulado += lec.kwh;
+                const costAcum = calcularFactura(acumulado, edeSeleccionada).costoTotal;
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-semibold text-slate-700">${lec.fecha.split('-')[2]}/${lec.fecha.split('-')[1]}</td>
+                    <td class="py-2.5 px-3 text-right">${lec.esFallo ? '<span class="text-amber-500 italic">Falla</span>' : '<strong>'+lec.kwh.toFixed(2)+' kWh</strong>'}</td>
+                    <td class="py-2.5 px-3 text-right font-mono text-slate-800">RD$ ${costAcum.toFixed(2)}</td>
+                    <td class="py-2.5 px-3 text-center"><button onclick="eliminarRegistro('${lec.fecha}')" class="text-slate-400 hover:text-rose-500"><i data-lucide="x" class="w-4 h-4"></i></button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Re-dibujar Barras
+            const cG = document.getElementById('grafica-barras'), cF = document.getElementById('grafica-fechas');
+            cG.innerHTML = `<div class="absolute inset-0 flex flex-col justify-between pointer-events-none opacity-10"><div class="border-b border-slate-400 w-full"></div><div class="border-b border-slate-400 w-full"></div><div class="w-full"></div></div>`;
+            cF.innerHTML = '';
+
+            if (paraGrafica.length > 0) {
+                const maxK = Math.max(...paraGrafica.map(l => l.kwh), 15);
+                paraGrafica.forEach(l => {
+                    const col = document.createElement('div');
+                    col.className = "flex flex-col items-center flex-1 min-w-[20px] max-w-[35px] group relative z-10 cursor-pointer";
+                    col.innerHTML = l.esFallo ? 
+                        `<span class="text-[9px] text-amber-500 mb-1">--</span><div class="w-full bg-amber-100 border border-dashed border-amber-300 rounded-t-md h-4 flex items-center justify-center text-amber-500"><i data-lucide="cloud-off" class="w-3 h-3"></i></div>` :
+                        `<span class="text-[9px] text-sky-500 font-bold mb-1 opacity-0 group-hover:opacity-100 transition-opacity">${l.kwh.toFixed(1)}</span><div class="w-full bg-sky-400 rounded-t-md transition-all group-hover:bg-sky-500" style="height: ${(l.kwh/maxK)*110}px"></div>`;
+                    cG.appendChild(col);
+
+                    const lbl = document.createElement('span');
+                    lbl.className = "text-center text-[9px] font-semibold text-slate-400 flex-1 min-w-[20px]";
+                    lbl.innerText = `${l.fecha.split('-')[2]}/${l.fecha.split('-')[1]}`;
+                    cF.appendChild(lbl);
+                });
+            }
+
+            lucide.createIcons();
+        }
+
+        function mostrarModalDetalleTarifa() {
+            const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
+            const calculo = calcularFactura(totalKwh, edeSeleccionada);
+            const contenido = document.getElementById('detalle-calculo-contenido');
+
+            let html = `
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-2"><p class="text-[10px] text-slate-400 font-bold uppercase">Distribuidora</p><p class="font-extrabold text-slate-800">${tarifasEde[edeSeleccionada].nombre}</p></div>
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-3"><p class="text-[10px] text-slate-400 font-bold uppercase">Consumo Total</p><p class="font-extrabold text-slate-800">${totalKwh.toFixed(2)} kWh</p></div>
+                <div class="space-y-1.5 border-t border-slate-100 pt-2"><div class="flex justify-between"><span>Cargo Fijo Obligatorio:</span><strong>RD$ ${calculo.cargoFijo.toFixed(2)}</strong></div>
+            `;
+            calculo.desglose.forEach(b => { html += `<div class="flex justify-between border-b border-slate-50 pb-1"><span>${b.rango}:</span><strong>RD$ ${b.total.toFixed(2)}</strong></div>`; });
+            html += `</div><div class="bg-emerald-50 text-emerald-800 p-3 rounded-xl font-bold flex justify-between mt-3"><span>Total Estimado:</span><span>RD$ ${calculo.costoTotal.toFixed(2)}</span></div>`;
+            contenido.innerHTML = html;
+            document.getElementById('modal-detalle').classList.remove('hidden');
+        }
+
+        function cerrarModalDetalle() { document.getElementById('modal-detalle').classList.add('hidden'); }
+
+        function mostrarAlertaRapida(msg) {
+            const div = document.createElement('div');
+            div.className = "fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900 text-white text-xs px-4 py-2 rounded-full shadow-xl z-50 transition-all duration-300 opacity-100 font-medium";
+            div.innerText = msg;
+            document.body.appendChild(div);
+            setTimeout(() => { div.style.opacity = '0'; setTimeout(() => div.remove(), 300); }, 2000);
+        }
+    </script>
+</body>
+</html>
+
+```
+  
