@@ -931,18 +931,22 @@
         }
 
         function agregarConsumo() {
-            const dateInput = document.getElementById('input-fecha').value;
-            const kwhInput = parseFloat(document.getElementById('input-kwh').value);
+    const dateInput = document.getElementById('input-fecha').value;
+    const kwhInput = parseFloat(document.getElementById('input-kwh').value);
 
-            if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
-                mostrarAlertaRapida('Por favor, ingresa valores válidos.');
-                return;
-            }
+    if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
+        mostrarAlertaRapida('Por favor, ingresa valores válidos.');
+        return;
+    }
 
-            const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
-            procesarGuardadoDoble(item);
-            document.getElementById('input-kwh').value = '';
-        }
+    const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
+    procesarGuardadoDoble(item);
+    
+    // Mensaje de confirmación solicitado
+    mostrarAlertaRapida(`Se guardo lectura del día ${dateInput}, correctamente`);
+    
+    document.getElementById('input-kwh').value = '';
+}
 
         function marcarErrorLectura() {
             const dateInput = document.getElementById('input-fecha').value;
