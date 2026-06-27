@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
     <title>Consumo Diario Telemedido - EDEs</title>
     
     <!-- Soporte para Web App Movil (PWA/Home Screen) -->
@@ -10,9 +11,11 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Consumo RD">
     
-    <!-- Icono Autocontenido -->
-    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><circle cx='256' [...]
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><cir[...]
+    <!-- Icono Autocontenido para Pantalla de Inicio en iPhone (Apple Touch Icon) -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><circle cx='256' cy='256' r='170' fill='none' stroke='white' stroke-width='5' stroke-dasharray='25 15' opacity='0.3'/><path d='M 80 256 L 140 256 L 180 160 L 220 340 L 260 100 L 300 400 L 340 200 L 380 256 L 432 256' fill='none' stroke='%2322d3ee' stroke-width='10' opacity='0.5'/><path d='M 290 60 L 150 270 L 250 270 L 222 452 L 362 242 L 262 242 Z' fill='%23fbbf24'/></svg>">
+    
+    <!-- Icono Autocontenido para Navegadores/Android (Favicon) -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><circle cx='256' cy='256' r='170' fill='none' stroke='white' stroke-width='5' stroke-dasharray='25 15' opacity='0.3'/><path d='M 80 256 L 140 256 L 180 160 L 220 340 L 260 100 L 300 400 L 340 200 L 380 256 L 432 256' fill='none' stroke='%2322d3ee' stroke-width='10' opacity='0.5'/><path d='M 290 60 L 150 270 L 250 270 L 222 452 L 362 242 L 262 242 Z' fill='%23fbbf24'/></svg>">
 
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
@@ -37,29 +40,27 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
             background: #94a3b8;
         }
+        /* Transición suave para las barras de la gráfica */
         .bar-transition {
             transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .pb-safe {
-            padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
         }
-        body {
-            padding-bottom: env(safe-area-inset-bottom);
-        }
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
-        }
+
+body {
+    padding-bottom: env(safe-area-inset-bottom);
+}   
     </style>
 </head>
+     <!-- Cambia el body a esto -->
 <body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
+
+    <!-- Cambia el contenedor principal para que tenga altura completa -->
     <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60">
-        
+
         <!-- HEADER -->
-        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-3 rounded-b-[2rem] shadow-lg relative">
+        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative">
             <div class="flex justify-between items-center mb-3">
                 <button class="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all" onclick="confirmarReseteo()" title="Resetear de fábrica">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -73,42 +74,24 @@
                 </div>
             </div>
 
-            <div class="mt-3">
+            <div class="mt-4">
                 <label class="block text-[10px] uppercase tracking-wider text-cyan-100 font-bold mb-1.5">Distribuidora Eléctrica</label>
-                <div class="grid grid-cols-3 gap-2 bg-black/15 p-1 rounded-xl mb-3">
-                    <button id="ede-edenorte" onclick="cambiarEde('edenorte')" class="py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm">EDENORTE</button>
-                    <button id="ede-edesur" onclick="cambiarEde('edesur')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">EDESUR</button>
-                    <button id="ede-edeeste" onclick="cambiarEde('edeeste')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">EDEESTE</button>
+                <div class="grid grid-cols-3 gap-2 bg-black/15 p-1 rounded-xl">
+                    <button id="ede-edenorte" onclick="cambiarEde('edenorte')" class="py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm">
+                        EDENORTE
+                    </button>
+                    <button id="ede-edesur" onclick="cambiarEde('edesur')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
+                        EDESUR
+                    </button>
+                    <button id="ede-edeeste" onclick="cambiarEde('edeeste')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
+                        EDEESTE
+                    </button>
                 </div>
-            </div>
-
-            <!-- BARRA DE NAVEGACIÓN -->
-            <div class="flex justify-around items-center bg-white/10 backdrop-blur-sm py-2 px-2 rounded-2xl border border-white/20">
-                <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1 text-sky-200 hover:text-white transition-all active:scale-90 flex-1">
-                    <i data-lucide="layout-dashboard" class="w-4.5 h-4.5"></i>
-                    <span class="text-[9px] font-bold">Consumo</span>
-                </button>
-                
-                <button id="tab-btn-calculadora" onclick="switchTab('calculadora')" class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all active:scale-90 flex-1">
-                    <i data-lucide="calculator" class="w-4.5 h-4.5"></i>
-                    <span class="text-[9px] font-bold">Calc.</span>
-                </button>
-                
-                <button id="tab-btn-tarifa" onclick="switchTab('tarifa')" class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all active:scale-90 flex-1">
-                    <i data-lucide="receipt" class="w-4.5 h-4.5"></i>
-                    <span class="text-[9px] font-bold">Tarifa</span>
-                </button>
-                
-                <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all active:scale-90 flex-1 relative">
-                    <i data-lucide="database" class="w-4.5 h-4.5"></i>
-                    <span class="text-[9px] font-bold">Cargar</span>
-                    <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[8px] min-w-[16px] h-[16px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-lg text-center">0</span>
-                </button>
             </div>
         </header>
 
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-4">
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-10">
             
             <!-- VISTA: CONSUMO (PRINCIPAL) -->
             <div id="view-consumo" class="tab-view space-y-5">
@@ -119,7 +102,7 @@
                     </div>
                     <div>
                         <h3 class="font-bold text-sm">¡Límite de 700 kWh Superado!</h3>
-                        <p class="text-xs text-rose-700 mt-1">Has entrado en tarifa monobloque. Todo tu consumo se calculará a la tasa plana más alta.</p>
+                        <p class="text-xs text-rose-700 mt-1">Has entrado en tarifa monobloque. Todo tu consumo se calculará a la tasa plana más alta de forma directa.</p>
                     </div>
                 </div>
 
@@ -171,9 +154,9 @@
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h3 class="text-sm font-extrabold text-slate-800">Consumo Diario (kWh)</h3>
-                            <p class="text-[11px] text-slate-500 font-medium">Desliza para ver todo el historial</p>
+                            <p class="text-[11px] text-slate-500 font-medium font-semibold">Desliza para ver todo el historial</p>
                         </div>
-                        <select id="filtro-lecturas" onchange="renderizarApp()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg py-1 px-2.5 font-bold text-slate-600 focus:ring-1 focus:ring-sky-500">
+                        <select id="filtro-lecturas" onchange="renderizarApp()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg py-1 px-2.5 font-bold text-slate-600 focus:ring-1 focus:ring-sky-500 focus:outline-none">
                             <option value="todos">Mostrar Todo</option>
                             <option value="con-datos">Omitir errores</option>
                         </select>
@@ -197,12 +180,12 @@
                         <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
                         </div>
-                        <h3 class="text-base font-bold text-slate-800">Estadísticas del Mes</h3>
+                        <h3 class="text-base font-bold text-slate-800">Talonario de Estadísticas del Mes</h3>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
                         <div class="bg-slate-50/75 p-4 rounded-3xl border border-slate-100/40 flex flex-col justify-between min-h-[110px]">
-                            <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Proyectado Mensual</p>
+                            <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider leading-tight">Proyectado<br>Mensual</p>
                             <div class="my-1">
                                 <span class="text-xl sm:text-2xl font-black text-indigo-600" id="stat-proyeccion">0.00</span>
                                 <span class="text-xs font-bold text-slate-400 ml-0.5">kWh</span>
@@ -211,16 +194,16 @@
                         </div>
 
                         <div class="bg-slate-50/75 p-4 rounded-3xl border border-slate-100/40 flex flex-col justify-between min-h-[110px]">
-                            <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider">Promedio Diario</p>
+                            <p class="text-[10px] text-slate-400 font-extrabold uppercase tracking-wider leading-tight">Promedio<br>Diario</p>
                             <div class="my-1">
                                 <span class="text-xl sm:text-2xl font-black text-slate-700" id="stat-promedio">0.00</span>
                                 <span class="text-xs font-bold text-slate-400 ml-0.5">kWh</span>
                             </div>
-                            <p class="text-[10px] text-slate-400 font-medium">Días con lectura</p>
+                            <p class="text-[10px] text-slate-400 font-medium">Días con lectura efectiva</p>
                         </div>
 
                         <div class="bg-emerald-50/30 p-4 rounded-3xl border border-emerald-100/80 flex flex-col justify-between min-h-[110px]">
-                            <p class="text-[10px] text-emerald-600 font-extrabold uppercase tracking-wider">Consumo Máximo</p>
+                            <p class="text-[10px] text-emerald-600 font-extrabold uppercase tracking-wider leading-tight">Consumo<br>Máximo</p>
                             <div class="my-1">
                                 <span class="text-xl sm:text-2xl font-black text-emerald-700" id="stat-maximo">0.00</span>
                                 <span class="text-xs font-bold text-emerald-500 ml-0.5">kWh</span>
@@ -229,7 +212,7 @@
                         </div>
 
                         <div class="bg-sky-50/30 p-4 rounded-3xl border border-sky-100/80 flex flex-col justify-between min-h-[110px]">
-                            <p class="text-[10px] text-sky-600 font-extrabold uppercase tracking-wider">Consumo Mínimo</p>
+                            <p class="text-[10px] text-sky-600 font-extrabold uppercase tracking-wider leading-tight">Consumo<br>Mínimo</p>
                             <div class="my-1">
                                 <span class="text-xl sm:text-2xl font-black text-sky-700" id="stat-minimo">0.00</span>
                                 <span class="text-xs font-bold text-sky-500 ml-0.5">kWh</span>
@@ -246,7 +229,7 @@
                         <div class="w-px h-5 bg-slate-200"></div>
                         <div class="flex items-center gap-1.5">
                             <i data-lucide="alert-circle" class="w-4.5 h-4.5 text-amber-500"></i>
-                            <span>Errores: <strong class="text-slate-700 text-sm font-extrabold ml-0.5" id="stat-dias-errores">0</strong></span>
+                            <span>Errores de lectura: <strong class="text-slate-700 text-sm font-extrabold ml-0.5" id="stat-dias-errores">0</strong></span>
                         </div>
                     </div>
                 </div>
@@ -272,10 +255,10 @@
                     </div>
 
                     <div class="grid grid-cols-2 gap-2">
-                        <button onclick="agregarConsumo()" class="bg-sky-500 text-white py-2.5 rounded-xl font-bold text-xs shadow-md hover:bg-sky-600 active:scale-[0.98] transition-all flex items-center justify-center gap-1">
+                        <button onclick="agregarConsumo()" class="bg-sky-500 text-white py-2.5 rounded-xl font-bold text-xs shadow-md shadow-sky-100 hover:bg-sky-600 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
                             <i data-lucide="save" class="w-3.5 h-3.5"></i> Guardar Día
                         </button>
-                        <button onclick="marcarErrorLectura()" class="bg-slate-100 text-slate-600 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-1">
+                        <button onclick="marcarErrorLectura()" class="bg-slate-100 text-slate-600 py-2.5 rounded-xl font-bold text-xs hover:bg-slate-200 active:scale-[0.98] transition-all flex items-center justify-center gap-1.5">
                             <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i> Marcar Error
                         </button>
                     </div>
@@ -284,9 +267,9 @@
                 <!-- TABLA DE LECTURAS -->
                 <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
-                        <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo</h3>
-                        <button onclick="confirmarLimpiezaPantalla()" class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 font-semibold transition-colors">
-                            <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpiar
+                        <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo Actual</h3>
+                        <button onclick="confirmarLimpiezaPantalla()" class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 font-semibold transition-colors" title="Limpia la pantalla pero conserva tu copia en 'Cargar Datos'">
+                            <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpiar Pantalla
                         </button>
                     </div>
 
@@ -296,14 +279,14 @@
                                 <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                     <th class="py-2.5 px-3 rounded-l-lg">Fecha</th>
                                     <th class="py-2.5 px-3 text-right">Consumo</th>
-                                    <th class="py-2.5 px-3 text-right">Costo</th>
+                                    <th class="py-2.5 px-3 text-right">Costo Acum.</th>
                                     <th class="py-2.5 px-3 text-center rounded-r-lg">Acción</th>
                                 </tr>
                             </thead>
                             <tbody id="tabla-registros" class="divide-y divide-slate-100"></tbody>
                         </table>
                         <div id="tabla-vacia" class="text-center py-8 text-slate-400 text-xs hidden">
-                            No hay lecturas. Usa "Cargar Datos" para restaurar.
+                            No hay lecturas en pantalla. Presiona abajo <strong class="text-slate-500">"Cargar Datos"</strong> para restaurar tu historial seguro.
                         </div>
                     </div>
                 </div>
@@ -316,88 +299,125 @@
                         <div class="bg-emerald-50 text-emerald-600 p-2 rounded-xl">
                             <i data-lucide="calculator" class="w-5 h-5"></i>
                         </div>
-                        <h3 class="text-base font-bold text-slate-800">Calculadora Tarifaria</h3>
+                        <h3 class="text-base font-bold text-slate-800">Calculadora Tarifaria de Distribuidora</h3>
                     </div>
                     <div class="space-y-3">
                         <div>
-                            <label class="block text-xs font-bold text-slate-500 mb-1">Consumo (kWh)</label>
+                            <label class="block text-xs font-bold text-slate-500 mb-1">Consumo a Calcular (kWh)</label>
                             <input type="number" id="calc-input-kwh" placeholder="Ej: 350" class="w-full px-4 py-3 text-sm bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-sky-500">
                         </div>
-                        <button onclick="ejecutarCalculadoraManual()" class="w-full bg-sky-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-sky-600 transition-colors flex items-center justify-center gap-2">
-                            <i data-lucide="play" class="w-4 h-4"></i> Calcular Tarifa
+                        <button onclick="ejecutarCalculadoraManual()" class="w-full bg-sky-500 text-white py-3 rounded-xl font-bold text-xs hover:bg-sky-600 transition-colors flex items-center justify-center gap-1.5">
+                            <i data-lucide="play" class="w-4 h-4"></i> Calcular Tarifa Dominicana
                         </button>
                     </div>
 
+                    <!-- Resultado de la calculadora manual -->
                     <div id="calc-resultado-bloque" class="hidden border-t border-slate-100 pt-4 space-y-3">
-                        <h4 class="text-xs font-bold uppercase text-slate-400">Desglose</h4>
+                        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Desglose de Facturación Directa</h4>
                         <div id="calc-resultado-contenido" class="space-y-2 text-xs"></div>
                     </div>
                 </div>
             </div>
 
-            <!-- VISTA: TARIFA DEL MES -->
+            <!-- VISTA: TARIFA DEL MES (IDÉNTICO A LA FOTO 1000525050.jpg) -->
             <div id="view-tarifa" class="tab-view hidden space-y-5">
                 <div class="bg-gradient-to-r from-cyan-400/10 to-sky-400/10 rounded-2xl p-4 text-center border border-cyan-100">
                     <h2 class="text-lg font-black text-sky-800">Tarifa del Mes</h2>
                 </div>
 
+                <!-- Toggles de Navegación del Historial -->
                 <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
-                    <button id="btn-toggle-tarifas" onclick="cambiarSeccionTarifa('tarifas')" class="py-2.5 text-xs font-bold rounded-xl transition-all bg-white text-sky-800 shadow-sm">Tarifas Actuales</button>
-                    <button id="btn-toggle-guardados" onclick="cambiarSeccionTarifa('guardados')" class="py-2.5 text-xs font-bold rounded-xl transition-all text-slate-600 hover:text-slate-800">Guardados</button>
+                    <button id="btn-toggle-tarifas" onclick="cambiarSeccionTarifa('tarifas')" class="py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm">
+                        Tarifas Actuales
+                    </button>
+                    <button id="btn-toggle-guardados" onclick="cambiarSeccionTarifa('guardados')" class="py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800">
+                        Cálculos Guardados
+                    </button>
                 </div>
 
-                <!-- Tarifas Actuales -->
+                <!-- SECCIÓN: TARIFAS ACTUALES -->
                 <div id="sec-tarifas-actuales" class="space-y-4">
                     <div class="bg-white rounded-3xl p-5 border border-slate-150 shadow-sm space-y-3">
                         <h4 class="text-sm font-extrabold text-slate-800 flex items-center gap-1.5">
                             <i data-lucide="info" class="w-4.5 h-4.5 text-sky-500"></i>
-                            Rangos Tarifarios (EDEs)
+                            Rangos Tarifarios Vigentes (EDEs)
                         </h4>
-                        <p class="text-xs text-slate-500">En RD, si superas 700 kWh aplica tarifa monobloque única.</p>
+                        <p class="text-xs text-slate-500 leading-normal">Los cálculos de tramos en la República Dominicana se dividen en rangos fijos progresivos. Si superas los 700 kWh, se te aplica la tarifa plana Monobloque sobre todo el consumo.</p>
                         
                         <div class="divide-y divide-slate-100 text-xs">
                             <div class="py-2 flex justify-between"><span>Cargo Fijo</span><strong class="text-slate-700">RD$ 126.81 ~ 127.15</strong></div>
-                            <div class="py-2 flex justify-between"><span>Rango 1 (0-200 kWh)</span><strong class="text-emerald-600">RD$ ~5.99/kWh</strong></div>
-                            <div class="py-2 flex justify-between"><span>Rango 2 (201-300 kWh)</span><strong class="text-sky-600">RD$ ~8.55/kWh</strong></div>
-                            <div class="py-2 flex justify-between"><span>Rango 3 (301-700 kWh)</span><strong class="text-amber-600">RD$ ~13.92/kWh</strong></div>
-                            <div class="py-2 flex justify-between"><span>Monobloque (&gt;700)</span><strong class="text-rose-600">RD$ ~14.12/kWh</strong></div>
+                            <div class="py-2 flex justify-between"><span>Rango 1 (0 - 200 kWh)</span><strong class="text-emerald-600">RD$ ~5.99 / kWh</strong></div>
+                            <div class="py-2 flex justify-between"><span>Rango 2 (201 - 300 kWh)</span><strong class="text-sky-600">RD$ ~8.55 / kWh</strong></div>
+                            <div class="py-2 flex justify-between"><span>Rango 3 (301 - 700 kWh)</span><strong class="text-amber-600">RD$ ~13.92 / kWh</strong></div>
+                            <div class="py-2 flex justify-between"><span>Monobloque (&gt;700 kWh)</span><strong class="text-rose-600">RD$ ~14.12 / kWh</strong></div>
                         </div>
                     </div>
                 </div>
 
-                <!-- Cálculos Guardados -->
+                <!-- SECCIÓN: CÁLCULOS GUARDADOS (FOTO DE COMPORTAMIENTO) -->
                 <div id="sec-calculos-guardados" class="hidden space-y-4">
-                    <button id="btn-multiple-select" onclick="toggleSeleccionMultiple()" class="w-full bg-sky-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-sky-600 transition-colors">
-                        <i data-lucide="check-square" class="w-4 h-4"></i> Seleccionar Múltiples
-                    </button>
+                    <div class="flex justify-between items-center">
+                        <button id="btn-multiple-select" onclick="toggleSeleccionMultiple()" class="w-full bg-sky-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-sky-600 transition-colors shadow-md shadow-sky-100 flex items-center justify-center gap-1.5">
+                            <i data-lucide="check-square" class="w-4 h-4"></i> Seleccionar Múltiples
+                        </button>
+                    </div>
+
+                    <!-- Listado dinámico de cálculos de mes -->
                     <div id="lista-calculos-contenedor" class="space-y-4"></div>
                 </div>
             </div>
 
-            <!-- VISTA: CARGAR DATOS -->
+            <!-- VISTA: CARGAR DATOS / CONFIG -->
             <div id="view-cargar" class="tab-view hidden space-y-5">
                 <div class="bg-white rounded-3xl p-5 border border-slate-150 shadow-sm space-y-4">
                     <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                         <div class="bg-sky-50 text-sky-600 p-2 rounded-xl">
-                            <i data-lucide="database" class="w-5 h-5"></i>
+                            <i data-lucide="database" class="text-sky-500"></i> Copia de Seguridad
                         </div>
                         <h3 class="text-base font-bold text-slate-800">Cargar Datos</h3>
                     </div>
                     <div class="space-y-2 pt-2">
-                        <button onclick="recuperarHistorialCompleto()" class="w-full bg-emerald-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-md flex items-center justify-center gap-2">
+                        <button onclick="recuperarHistorialCompleto()" class="w-full bg-emerald-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-md shadow-emerald-100 flex items-center justify-center gap-1.5">
                             <i data-lucide="download-cloud" class="w-4 h-4"></i> Cargar Historial Completo
                         </button>
-                        <button onclick="restaurarUltimoDatosGuardados()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200 transition-colors flex items-center justify-center gap-2">
-                            <i data-lucide="history" class="w-4 h-4"></i> Restaurar Último Guardado
+                        <button onclick="restaurarUltimoDatosGuardados()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5">
+                            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i> Restaurar último datos guardado
                         </button>
                     </div>
                 </div>
             </div>
 
         </main>
+
+        <!-- BARRA INFERIOR (4 OPCIONES) -->
+        
+<footer class="bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-2 flex justify-around items-center text-[10px] font-bold text-slate-400 z-50 pb-safe shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+    
+    <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 transition-all active:scale-90 w-16">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span>Consumo</span>
+    </button>
+    
+    <button id="tab-btn-calculadora" onclick="switchTab('calculadora')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
+        <i data-lucide="calculator" class="w-6 h-6"></i>
+        <span>Calculadora</span>
+    </button>
+    
+    <button id="tab-btn-tarifa" onclick="switchTab('tarifa')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
+        <i data-lucide="receipt" class="w-6 h-6"></i>
+        <span>Tarifa</span>
+    </button>
+    
+    <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative">
+        <i data-lucide="database" class="w-6 h-6"></i>
+        <span>Cargar</span>
+        <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
+    </button>
+</footer>
+
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN -->
+    <!-- MODAL DE CONFIRMACIÓN GENÉRICO -->
     <div id="modal-confirmacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
         <div class="bg-white rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-slate-100 animate-fade-in">
             <div class="text-center space-y-2">
@@ -414,11 +434,6 @@
         </div>
     </div>
 
-    <!-- ALERTA RÁPIDA -->
-    <div id="toast-alerta" class="fixed bottom-20 left-4 right-4 bg-slate-800 text-white px-4 py-3 rounded-xl text-xs font-semibold shadow-lg hidden max-w-sm mx-auto">
-        <span id="toast-mensaje"></span>
-    </div>
-
     <script>
         lucide.createIcons();
 
@@ -432,21 +447,22 @@
         let lecturas = [];
         let calculosGuardados = [];
         let callbackConfirmacion = null;
-        let seccionTarifaActiva = 'tarifas';
+        let seccionTarifaActiva = 'tarifas'; // 'tarifas' o 'guardados'
         let modoSeleccionMultiple = false;
         let idsSeleccionados = [];
 
-        // ==================== INICIALIZACIÓN ====================
         window.onload = function() {
+            // Establecer fecha por defecto (hoy)
             const hoy = new Date();
             document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
             
+            // CARGAR LECTURAS ACTIVAS DEL ÚLTIMO ACCESO
             const savedLecturas = localStorage.getItem('lecturas_ciclo_actual');
             const savedEde = localStorage.getItem('ede_seleccionada_v4');
             const savedBackup = localStorage.getItem('copia_seguridad_historial');
             const savedCalculos = localStorage.getItem('calculos_guardados_v4');
             
-            // Inicializar cálculos guardados si no existen
+            // Inicializar cálculos guardados por defecto con los valores exactos de la imagen si no existen
             if (!savedCalculos) {
                 const calculosIniciales = [
                     {
@@ -472,16 +488,29 @@
                             { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
                             { rango: 'Segundo tramo', kwh: 86, tasa: 8.51, total: 731.86 }
                         ]
+                    },
+                    {
+                        id: 3,
+                        fecha: '05/02/2026',
+                        lecturaAnterior: 7037,
+                        lecturaActual: 7335,
+                        consumo: 298,
+                        costo: 2154.79,
+                        desglose: [
+                            { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
+                            { rango: 'Segundo tramo', kwh: 98, tasa: 8.51, total: 833.98 }
+                        ]
                     }
                 ];
                 localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosIniciales));
                 calculosGuardados = calculosIniciales;
+                // Inicializar lectura base última en 7891
                 localStorage.setItem('lectura_base_v4', '7891');
             } else {
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
-            // Inicializar lecturas si no existen
+            // Si el almacenamiento de lecturas diarias está completamente vacío
             if (!savedBackup && !savedLecturas) {
                 const historialBaseInicial = [
                     { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
@@ -495,8 +524,8 @@
                     { fecha: '2026-06-12', kwh: 10.19, esFallo: false },
                     { fecha: '2026-06-13', kwh: 10.47, esFallo: false },
                     { fecha: '2026-06-14', kwh: 16.04, esFallo: false },
-                    { fecha: '2026-06-15', kwh: 0.00, esFallo: true },
-                    { fecha: '2026-06-16', kwh: 0.00, esFallo: true },
+                    { fecha: '2026-06-15', kwh: 0.00, esFallo: true }, 
+                    { fecha: '2026-06-16', kwh: 0.00, esFallo: true }, 
                     { fecha: '2026-06-17', kwh: 13.56, esFallo: false },
                     { fecha: '2026-06-18', kwh: 11.90, esFallo: false },
                     { fecha: '2026-06-19', kwh: 16.22, esFallo: false },
@@ -506,35 +535,55 @@
                 localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(historialBaseInicial));
                 lecturas = [...historialBaseInicial];
             } else {
-                // Fusionar backup y activos
+                // Fusión de memoria
                 const backupActual = savedBackup ? JSON.parse(savedBackup) : [];
                 const activosActual = savedLecturas ? JSON.parse(savedLecturas) : [];
+                
                 const mapaLecturas = {};
                 backupActual.forEach(item => { mapaLecturas[item.fecha] = item; });
                 activosActual.forEach(item => { mapaLecturas[item.fecha] = item; });
+                
                 lecturas = Object.values(mapaLecturas);
                 lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+                
                 localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
                 localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
             }
 
-            if (savedEde) edeSeleccionada = savedEde;
+            // Cargar distribuidora preferida
+            if (savedEde) {
+                edeSeleccionada = savedEde;
+            }
             
             renderizarApp();
-            setTimeout(() => mostrarAlertaRapida('✓ Historial cargado automáticamente'), 600);
+
+            setTimeout(() => {
+                mostrarAlertaRapida('✓ Historial completo cargado automáticamente');
+            }, 600);
         };
 
-        // ==================== NAVEGACIÓN ====================
+        // GESTIÓN DE NAVEGACIÓN EN PESTAÑAS (FOOTER)
         function switchTab(tabId) {
-            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            document.querySelectorAll('[id^="tab-btn-"]').forEach(btn => {
-                btn.className = "flex flex-col items-center gap-1 text-white/50 hover:text-white transition-all active:scale-90 flex-1";
+            // Ocultar todas las vistas
+            document.querySelectorAll('.tab-view').forEach(view => {
+                view.classList.add('hidden');
             });
-            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1 text-sky-200 hover:text-white transition-all active:scale-90 flex-1";
+            
+            // Mostrar vista seleccionada
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            
+            // Resetear estilos de botones footer
+            document.querySelectorAll('footer button').forEach(btn => {
+                btn.className = "flex flex-col items-center gap-1 hover:text-slate-600 transition-colors relative";
+            });
+            
+            // Destacar botón activo
+            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1 text-sky-500 font-bold transition-all relative";
+            
             lucide.createIcons();
         }
 
+        // TARIFA DEL MES: CAMBIO DE SECCIÓN INTERNA
         function cambiarSeccionTarifa(seccion) {
             seccionTarifaActiva = seccion;
             const btnTarifas = document.getElementById('btn-toggle-tarifas');
@@ -543,13 +592,15 @@
             const secGuardados = document.getElementById('sec-calculos-guardados');
 
             if (seccion === 'tarifas') {
-                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl bg-white text-sky-800 shadow-sm";
-                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-800";
+                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
+                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
                 secTarifas.classList.remove('hidden');
                 secGuardados.classList.add('hidden');
+                modoSeleccionMultiple = false;
+                idsSeleccionados = [];
             } else {
-                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl bg-white text-sky-800 shadow-sm";
-                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl text-slate-600 hover:text-slate-800";
+                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
+                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
                 secGuardados.classList.remove('hidden');
                 secTarifas.classList.add('hidden');
                 renderizarSeccionGuardados();
@@ -557,216 +608,180 @@
             lucide.createIcons();
         }
 
-        // ==================== CÁLCULOS TARIFARIOS ====================
-        function calcularFactura(totalKwh, ede) {
-            const tarifa = tarifasEde[ede];
-            let costo = tarifa.cargoFijo;
-            const desglose = [];
+        // COMPORTAMIENTO GUARDADO AUTOMÁTICO EN DÍA 5
+        function evaluarGuardadoAutomaticoDia5(lecturaNueva) {
+            if (!lecturaNueva || lecturaNueva.esFallo) return;
 
-            if (totalKwh > 700) {
-                // Monobloque: toda la energía a tasa única
-                const totalMonobloque = totalKwh * tarifa.monobloque;
-                desglose.push({ rango: 'Monobloque (>700)', kwh: totalKwh, tasa: tarifa.monobloque, total: totalMonobloque });
-                costo += totalMonobloque;
-            } else {
-                // Rango 1: 0-200 kWh
-                let kwh1 = Math.min(totalKwh, 200);
-                if (kwh1 > 0) {
-                    const total1 = kwh1 * tarifa.rango1;
-                    desglose.push({ rango: 'Rango 1 (0-200)', kwh: kwh1, tasa: tarifa.rango1, total: total1 });
-                    costo += total1;
-                }
+            const partes = lecturaNueva.fecha.split('-');
+            const dia = parseInt(partes[2]);
+            const mes = partes[1];
+            const anio = partes[0];
 
-                // Rango 2: 201-300 kWh
-                if (totalKwh > 200) {
-                    let kwh2 = Math.min(totalKwh - 200, 100);
-                    const total2 = kwh2 * tarifa.rango2;
-                    desglose.push({ rango: 'Rango 2 (201-300)', kwh: kwh2, tasa: tarifa.rango2, total: total2 });
-                    costo += total2;
-                }
+            // Si es exactamente día 5 de cualquier mes
+            if (dia === 5) {
+                const claveFecha = `05/${mes}/${anio}`;
+                
+                // Verificar si ya ha sido archivado este mes
+                const yaArchivado = calculosGuardados.some(c => c.fecha === claveFecha);
+                if (!yaArchivado) {
+                    const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
+                    if (totalKwh <= 1) return; // Evitar archivar ciclos vacíos o con consumos insignificantes
 
-                // Rango 3: 301-700 kWh
-                if (totalKwh > 300) {
-                    let kwh3 = totalKwh - 300;
-                    const total3 = kwh3 * tarifa.rango3;
-                    desglose.push({ rango: 'Rango 3 (301-700)', kwh: kwh3, tasa: tarifa.rango3, total: total3 });
-                    costo += total3;
+                    const calculoTarifa = calcularFactura(totalKwh, edeSeleccionada);
+                    
+                    // Recuperar el histórico de lecturas del medidor
+                    let lecturaBase = parseFloat(localStorage.getItem('lectura_base_v4') || '7891');
+                    const anterior = lecturaBase;
+                    const actual = anterior + totalKwh;
+
+                    const nuevoRegistroMes = {
+                        id: Date.now(),
+                        fecha: claveFecha,
+                        lecturaAnterior: anterior,
+                        lecturaActual: actual,
+                        consumo: totalKwh,
+                        costo: calculoTarifa.costoTotal,
+                        desglose: calculoTarifa.desglose.map(b => ({
+                            rango: b.rango,
+                            kwh: b.kwh,
+                            tasa: b.tasa,
+                            total: b.total
+                        }))
+                    };
+
+                    calculosGuardados.unshift(nuevoRegistroMes);
+                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
+                    localStorage.setItem('lectura_base_v4', actual.toString());
+
+                    renderizarApp();
+                    
+                    setTimeout(() => {
+                        abrirConfirmacion(
+                            '¡Ciclo Auto-Guardado!',
+                            `Se ha completado el Día 5 de cobro. El ciclo se archivó automáticamente por fecha con un total de ${totalKwh.toFixed(1)} kWh (RD$ ${calculoTarifa.costoTotal.toFixed(2)}). ¿Deseas limpiar la pantalla para comenzar el nuevo ciclo de consumo?`,
+                            'bg-sky-500 hover:bg-sky-600',
+                            'alert-triangle',
+                            function() {
+                                lecturas = [];
+                                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                                renderizarApp();
+                                mostrarAlertaRapida('Pantalla despejada para el nuevo mes.');
+                            }
+                        );
+                    }, 1000);
                 }
             }
-
-            return { costoTotal: costo, desglose };
         }
 
-        // ==================== RENDERIZACIÓN PRINCIPAL ====================
-        function renderizarApp() {
-            const filtro = document.getElementById('filtro-lecturas').value;
-            const lecturasAFiltrar = filtro === 'con-datos' ? lecturas.filter(l => !l.esFallo) : lecturas;
+        // CONTROL DE SELECCIÓN MÚLTIPLE (ELIMINAR EN LOTE)
+        function toggleSeleccionMultiple() {
+            modoSeleccionMultiple = !modoSeleccionMultiple;
+            idsSeleccionados = [];
             
-            const totalKwh = lecturasAFiltrar.reduce((acc, curr) => acc + curr.kwh, 0);
-            const costo = calcularFactura(totalKwh, edeSeleccionada);
-            
-            // Actualizar totales
-            document.getElementById('total-kwh').textContent = totalKwh.toFixed(2);
-            document.getElementById('total-pesos').textContent = `RD$ ${costo.costoTotal.toFixed(2)}`;
-            document.getElementById('progreso-texto').textContent = `${totalKwh.toFixed(0)} / 700 kWh`;
-            
-            // Actualizar barra de progreso con colores
-            const porcentaje = Math.min(100, (totalKwh / 700) * 100);
-            if (porcentaje <= 30) {
-                // Verde: 0-30%
-                document.getElementById('progreso-barra-verde').style.width = porcentaje + '%';
-                document.getElementById('progreso-barra-amarilla').style.width = '0%';
-                document.getElementById('progreso-barra-roja').style.width = '0%';
-            } else if (porcentaje <= 80) {
-                // Amarillo: 30-80%
-                document.getElementById('progreso-barra-verde').style.width = '30%';
-                document.getElementById('progreso-barra-amarilla').style.width = (porcentaje - 30) + '%';
-                document.getElementById('progreso-barra-roja').style.width = '0%';
+            const btn = document.getElementById('btn-multiple-select');
+            if (modoSeleccionMultiple) {
+                btn.className = "w-full bg-rose-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-rose-600 transition-colors shadow-md flex items-center justify-center gap-1.5";
+                btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Seleccionados (0)`;
             } else {
-                // Rojo: 80-100%+
-                document.getElementById('progreso-barra-verde').style.width = '30%';
-                document.getElementById('progreso-barra-amarilla').style.width = '50%';
-                document.getElementById('progreso-barra-roja').style.width = (porcentaje - 80) + '%';
+                btn.className = "w-full bg-sky-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-sky-600 transition-colors shadow-md flex items-center justify-center gap-1.5";
+                btn.innerHTML = `<i data-lucide="check-square" class="w-4 h-4"></i> Seleccionar Múltiples`;
             }
-
-            document.getElementById('alerta-exceso').classList.toggle('hidden', totalKwh <= 700);
-            
-            // Calcular estadísticas
-            const diasActivos = lecturasAFiltrar.filter(l => !l.esFallo).length;
-            const diasErrores = lecturasAFiltrar.filter(l => l.esFallo).length;
-            const promedioDiario = diasActivos > 0 ? totalKwh / diasActivos : 0;
-            const maxKwh = lecturasAFiltrar.reduce((max, l) => l.kwh > max ? l.kwh : max, 0);
-            const minKwh = lecturasAFiltrar.filter(l => l.kwh > 0).reduce((min, l) => l.kwh < min ? l.kwh : min, Infinity);
-            const maxDia = lecturasAFiltrar.find(l => l.kwh === maxKwh);
-            const minDia = lecturasAFiltrar.find(l => l.kwh === minKwh);
-
-            document.getElementById('stat-proyeccion').textContent = (promedioDiario * 30).toFixed(0);
-            document.getElementById('stat-promedio').textContent = promedioDiario.toFixed(2);
-            document.getElementById('stat-maximo').textContent = maxKwh.toFixed(2);
-            document.getElementById('stat-minimo').textContent = (minKwh === Infinity ? 0 : minKwh).toFixed(2);
-            document.getElementById('stat-dias-activos').textContent = diasActivos;
-            document.getElementById('stat-dias-errores').textContent = diasErrores;
-            
-            if (maxDia) {
-                const [año, mes, día] = maxDia.fecha.split('-');
-                document.getElementById('stat-maximo-dia').textContent = `Día: ${día}/${mes}`;
-            }
-            if (minDia && minKwh !== Infinity) {
-                const [año, mes, día] = minDia.fecha.split('-');
-                document.getElementById('stat-minimo-dia').textContent = `Día: ${día}/${mes}`;
-            }
-
-            // Renderizar gráfico
-            const grafica = document.getElementById('grafica-contenedor');
-            grafica.innerHTML = '';
-            const maxKwhGrafico = Math.max(...lecturasAFiltrar.map(l => l.kwh), 1);
-            
-            lecturasAFiltrar.forEach((lectura) => {
-                const altura = (lectura.kwh / maxKwhGrafico) * 150;
-                const [año, mes, día] = lectura.fecha.split('-');
-                
-                const barra = document.createElement('div');
-                barra.className = 'flex flex-col items-center gap-2';
-                barra.innerHTML = `
-                    <div class="relative group">
-                        <div class="w-8 bar-transition rounded-t-lg ${lectura.esFallo ? 'bg-slate-300' : 'bg-gradient-to-t from-sky-500 to-cyan-400'}" style="height: ${altura}px;"></div>
-                        <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-                            ${lectura.kwh.toFixed(1)} kWh<br>${día}/${mes}
-                        </div>
-                    </div>
-                    <span class="text-[10px] text-slate-400 font-semibold">${día}</span>
-                `;
-                grafica.appendChild(barra);
-            });
-
-            const rango = detectarRangoCiclo(lecturas);
-            document.getElementById('rango-ciclo').textContent = rango;
-            document.getElementById('badge-guardados').textContent = calculosGuardados.length;
-            
-            renderizarTabla();
-            actualizarBotonesEde();
+            renderizarSeccionGuardados();
             lucide.createIcons();
         }
 
-        function detectarRangoCiclo(lecturas) {
-            if (lecturas.length === 0) return 'Sin datos';
-            const fechas = lecturas.map(l => new Date(l.fecha)).sort((a, b) => a - b);
-            const inicio = fechas[0].toLocaleDateString('es-DO');
-            const fin = fechas[fechas.length - 1].toLocaleDateString('es-DO');
-            return `${inicio} a ${fin}`;
-        }
-
-        function renderizarTabla() {
-            const tbody = document.getElementById('tabla-registros');
-            const tabla = document.getElementById('tabla-vacia');
-            tbody.innerHTML = '';
+        function toggleSeleccionarTarjeta(id) {
+            if (!modoSeleccionMultiple) return;
             
-            if (lecturas.length === 0) {
-                tabla.classList.remove('hidden');
-                return;
+            const index = idsSeleccionados.indexOf(id);
+            if (index > -1) {
+                idsSeleccionados.splice(index, 1);
+            } else {
+                idsSeleccionados.push(id);
             }
-            tabla.classList.add('hidden');
 
-            lecturas.forEach((lectura) => {
-                const costo = calcularFactura(lectura.kwh, edeSeleccionada);
-                
-                const fila = document.createElement('tr');
-                fila.className = 'hover:bg-slate-50 transition-colors';
-                fila.innerHTML = `
-                    <td class="py-2.5 px-3">${lectura.fecha}</td>
-                    <td class="py-2.5 px-3 text-right font-semibold">${lectura.esFallo ? '—' : lectura.kwh.toFixed(2)} kWh</td>
-                    <td class="py-2.5 px-3 text-right">${lectura.esFallo ? 'Error' : `RD$ ${costo.costoTotal.toFixed(2)}`}</td>
-                    <td class="py-2.5 px-3 text-center">
-                        <button onclick="eliminarRegistro('${lectura.fecha}')" class="text-rose-500 hover:bg-rose-50 p-1 rounded transition-colors">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(fila);
-            });
-            lucide.createIcons();
+            // Actualizar botón eliminar
+            const btn = document.getElementById('btn-multiple-select');
+            btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Seleccionados (${idsSeleccionados.length})`;
+            
+            // Actualizar diseño de la tarjeta seleccionada
+            const cardEl = document.getElementById(`card-guardado-${id}`);
+            if (idsSeleccionados.includes(id)) {
+                cardEl.classList.add('border-sky-500', 'bg-sky-50/20');
+            } else {
+                cardEl.classList.remove('border-sky-500', 'bg-sky-50/20');
+            }
         }
 
-        function actualizarBotonesEde() {
-            ['edenorte', 'edesur', 'edeeste'].forEach(ede => {
-                const btn = document.getElementById(`ede-${ede}`);
-                if (ede === edeSeleccionada) {
-                    btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm";
-                } else {
-                    btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10";
+        function eliminarTarjetaUnica(id) {
+            abrirConfirmacion(
+                '¿Eliminar este cálculo?',
+                'Se borrará de forma permanente de tu historial de Tarifas del Mes.',
+                'bg-rose-500 hover:bg-rose-600',
+                'alert-octagon',
+                function() {
+                    calculosGuardados = calculosGuardados.filter(c => c.id !== id);
+                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
+                    renderizarSeccionGuardados();
+                    mostrarAlertaRapida('Cálculo eliminado.');
                 }
-            });
+            );
         }
 
+        // RENDERIZAR LISTADO DE CÁLCULOS GUARDADOS (IGUAL A LA IMAGEN)
         function renderizarSeccionGuardados() {
             const contenedor = document.getElementById('lista-calculos-contenedor');
             contenedor.innerHTML = '';
 
             if (calculosGuardados.length === 0) {
-                contenedor.innerHTML = '<div class="text-center py-10 text-slate-400 text-xs">No hay cálculos archivados.</div>';
+                contenedor.innerHTML = `
+                    <div class="text-center py-10 text-slate-400 text-xs font-medium">
+                        No hay cálculos archivados en este dispositivo.
+                    </div>`;
                 return;
             }
 
             calculosGuardados.forEach(item => {
-                const tramosHtml = item.desglose.map(b => 
-                    `<p class="text-[11px] text-cyan-700 font-medium">${b.rango}: ${b.kwh.toFixed(0)} kWh × $${b.tasa.toFixed(2)} = $${b.total.toFixed(2)}</p>`
-                ).join('');
+                const tramosHtml = item.desglose.map(b => {
+                    const desc = b.rango.includes('tramo') || b.rango.includes('Rango') ? b.rango : `Rango (${b.rango})`;
+                    return `<p class="text-[11px] text-[#0284c7] font-medium tracking-tight">${desc}: ${b.kwh.toFixed(0)} kWh x $${b.tasa.toFixed(2)} = $${b.total.toFixed(2)}</p>`;
+                }).join('');
+
+                const isSelected = idsSeleccionados.includes(item.id);
+                const isSelectedStyle = isSelected ? 'border-sky-500 bg-sky-50/20' : 'border-slate-100';
 
                 const card = document.createElement('div');
-                card.className = 'bg-white rounded-3xl p-5 border border-slate-100 shadow-xs';
+                card.id = `card-guardado-${item.id}`;
+                card.onclick = () => { if (modoSeleccionMultiple) toggleSeleccionarTarjeta(item.id); };
+                card.className = `bg-white rounded-3xl p-5 border shadow-xs transition-all duration-200 relative ${isSelectedStyle}`;
+                
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
-                        <span class="text-sm font-extrabold text-cyan-600">Fecha: ${item.fecha}</span>
-                        <button onclick="eliminarTarjetaUnica(${item.id})" class="text-rose-500 hover:bg-rose-50 p-1 rounded">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
+                        <div class="flex items-center gap-2">
+                            ${modoSeleccionMultiple ? `
+                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-sky-500 bg-sky-500 text-white' : 'border-slate-300' }">
+                                    ${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
+                                </div>` : ''
+                            }
+                            <span class="text-sm font-extrabold text-[#0284c7]">Fecha: ${item.fecha}</span>
+                        </div>
+                        <div class="flex items-center gap-2.5">
+                            <span class="text-base font-extrabold text-[#10b981]">$${item.costo.toFixed(2)}</span>
+                            ${!modoSeleccionMultiple ? `
+                                <button onclick="event.stopPropagation(); eliminarTarjetaUnica(${item.id})" class="text-rose-500 p-1 hover:bg-rose-50 rounded-lg transition-colors">
+                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                                </button>` : ''
+                            }
+                        </div>
                     </div>
+                    
                     <div class="space-y-1.5 text-slate-600 text-xs">
                         <p>Lectura anterior: ${item.lecturaAnterior.toFixed(0)} kWh</p>
                         <p>Lectura actual: ${item.lecturaActual.toFixed(0)} kWh</p>
-                        <p class="font-bold text-slate-900">Consumo: ${item.consumo.toFixed(0)} kWh</p>
-                        <div class="pt-1.5 border-t border-slate-100 space-y-1">${tramosHtml}</div>
-                        <p class="font-bold text-emerald-600 text-sm">Total: RD$ ${item.costo.toFixed(2)}</p>
+                        <p class="font-extrabold text-slate-900 text-[13px] my-1">Consumo: ${item.consumo.toFixed(0)} kWh</p>
+                        <div class="pt-1.5 border-t border-slate-100 space-y-1">
+                            ${tramosHtml}
+                        </div>
                     </div>
                 `;
                 contenedor.appendChild(card);
@@ -774,183 +789,495 @@
             lucide.createIcons();
         }
 
-        // ==================== GESTIÓN DE DATOS ====================
-        function eliminarTarjetaUnica(id) {
-            abrirConfirmacion('¿Eliminar este cálculo?', 'Se borrará permanentemente.', 'bg-rose-500 hover:bg-rose-600', 'alert-octagon', function() {
-                calculosGuardados = calculosGuardados.filter(c => c.id !== id);
-                localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
-                renderizarSeccionGuardados();
-                mostrarAlertaRapida('Cálculo eliminado.');
-            });
+        // CONFIRMAR ELIMINACIÓN DE SELECCIÓN MÚLTIPLE
+        function ejecutarEliminarLote() {
+            if (idsSeleccionados.length === 0) {
+                mostrarAlertaRapida('Por favor, selecciona al menos un cálculo.');
+                return;
+            }
+            abrirConfirmacion(
+                '¿Eliminar los elementos?',
+                `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos seleccionados de forma irreversible?`,
+                'bg-rose-500 hover:bg-rose-600',
+                'alert-octagon',
+                function() {
+                    calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
+                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
+                    toggleSeleccionMultiple();
+                    mostrarAlertaRapida('Elementos eliminados correctamente.');
+                }
+            );
         }
 
-        function toggleSeleccionMultiple() {
-            modoSeleccionMultiple = !modoSeleccionMultiple;
-            renderizarSeccionGuardados();
-        }
+        // Sobrescribir el botón proceder para selección múltiple
+        document.getElementById('confirm-btn-proceder').onclick = function() {
+            if (callbackConfirmacion) callbackConfirmacion();
+            cerrarModalConfirmacion();
+        };
 
-        // ==================== MODALES Y ALERTAS ====================
+        // GESTIÓN DE MODALES DE CONFIRMACIÓN (Alternativa a alert/confirm)
         function abrirConfirmacion(titulo, desc, colorBtn, icono, callback) {
             document.getElementById('confirm-titulo').innerText = titulo;
             document.getElementById('confirm-descripcion').innerText = desc;
             
             const btn = document.getElementById('confirm-btn-proceder');
-            btn.onclick = function() {
-                if (callback) callback();
-                cerrarModalConfirmacion();
-            };
+            
+            // Si es eliminación en lote
+            if (modoSeleccionMultiple && idsSeleccionados.length > 0 && callbackConfirmacion === ejecutarEliminarLote) {
+                btn.onclick = function() {
+                    ejecutarEliminarLote();
+                    cerrarModalConfirmacion();
+                };
+            } else {
+                btn.onclick = function() {
+                    if (callback) callback();
+                    cerrarModalConfirmacion();
+                };
+            }
+
             btn.className = `w-full text-white py-2 rounded-xl text-xs font-bold transition-colors ${colorBtn}`;
             
             const iconWrap = document.getElementById('confirm-icon-wrapper');
-            if (colorBtn.includes('rose')) {
+            if (colorBtn.includes('rose') || colorBtn.includes('red')) {
                 iconWrap.className = "mx-auto w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2";
+                document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-octagon');
+            } else {
+                iconWrap.className = "mx-auto w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2";
+                document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-triangle');
             }
             
+            lucide.createIcons();
             callbackConfirmacion = callback;
             document.getElementById('modal-confirmacion').classList.remove('hidden');
-            lucide.createIcons();
         }
+
+        // Modificar para vincular botón procediente de eliminación múltiple
+        const proceedOriginal = document.getElementById('btn-multiple-select').onclick;
+        document.getElementById('btn-multiple-select').onclick = function() {
+            if (modoSeleccionMultiple && idsSeleccionados.length > 0) {
+                abrirConfirmacion(
+                    '¿Eliminar los elementos?',
+                    `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos seleccionados de forma irreversible?`,
+                    'bg-rose-500 hover:bg-rose-600',
+                    'alert-octagon',
+                    function() {
+                        calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
+                        localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
+                        toggleSeleccionMultiple();
+                        mostrarAlertaRapida('Elementos eliminados correctamente.');
+                    }
+                );
+            } else {
+                toggleSeleccionMultiple();
+            }
+        };
 
         function cerrarModalConfirmacion() {
             document.getElementById('modal-confirmacion').classList.add('hidden');
+            callbackConfirmacion = null;
         }
 
-        function mostrarAlertaRapida(mensaje) {
-            const toast = document.getElementById('toast-alerta');
-            document.getElementById('toast-mensaje').textContent = mensaje;
-            toast.classList.remove('hidden');
-            setTimeout(() => {
-                toast.classList.add('hidden');
-            }, 2000);
+        // RESPALDO DE HISTORIAL COMPLETO
+        function recuperarHistorialCompleto() {
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            if (backupActual.length === 0) {
+                mostrarAlertaRapida('No hay datos en tu copia de seguridad.');
+                return;
+            }
+            lecturas = [...backupActual];
+            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            renderizarApp();
+            mostrarAlertaRapida('¡Historial completo cargado!');
         }
 
-        // ==================== GESTIÓN DE LECTURAS ====================
+        // RESTAURAR ÚLTIMO DATOS GUARDADO (Fusión inteligente)
+        function restaurarUltimoDatosGuardados() {
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            if (backupActual.length === 0) {
+                mostrarAlertaRapida('No hay datos guardados en la copia de seguridad.');
+                return;
+            }
+            
+            const mapaLecturas = {};
+            lecturas.forEach(item => { mapaLecturas[item.fecha] = item; });
+            backupActual.forEach(item => {
+                if (!mapaLecturas[item.fecha]) {
+                    mapaLecturas[item.fecha] = item;
+                }
+            });
+            
+            lecturas = Object.values(mapaLecturas);
+            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            
+            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
+            
+            renderizarApp();
+            mostrarAlertaRapida('¡Último datos restaurados y fusionados con éxito!');
+        }
+
+        function cambiarEde(edeKey) {
+            edeSeleccionada = edeKey;
+            localStorage.setItem('ede_seleccionada_v4', edeKey);
+            renderizarApp();
+        }
+
+        // GUARDADO EN TIEMPO REAL COOPERATIVO
         function procesarGuardadoDoble(nuevaLectura) {
-            const idx = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
-            if (idx !== -1) lecturas[idx] = nuevaLectura;
+            // 1. Guardar en vista activa de pantalla
+            const idxCiclo = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxCiclo !== -1) lecturas[idxCiclo] = nuevaLectura;
             else lecturas.push(nuevaLectura);
             lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
             localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
 
-            let backup = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            const idxBackup = backup.findIndex(l => l.fecha === nuevaLectura.fecha);
-            if (idxBackup !== -1) backup[idxBackup] = nuevaLectura;
-            else backup.push(nuevaLectura);
-            backup.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backup));
+            // 2. Guardar en copia de seguridad de forma paralela
+            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            const idxBackup = backupTotal.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxBackup !== -1) backupTotal[idxBackup] = nuevaLectura;
+            else backupTotal.push(nuevaLectura);
+            backupTotal.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
 
             renderizarApp();
+
+            // Evaluar si esta nueva lectura gatilla el Guardado Automático del Día 5
+            evaluarGuardadoAutomaticoDia5(nuevaLectura);
         }
 
-        function agregarConsumo() {
-            const fecha = document.getElementById('input-fecha').value;
-            const kwh = parseFloat(document.getElementById('input-kwh').value);
+     function agregarConsumo() {
+    const dateInput = document.getElementById('input-fecha').value;
+    const kwhInput = parseFloat(document.getElementById('input-kwh').value);
 
-            if (!fecha || isNaN(kwh) || kwh < 0) {
-                mostrarAlertaRapida('Ingresa valores válidos.');
-                return;
-            }
+    if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
+        mostrarAlertaRapida('Por favor, ingresa valores válidos.');
+        return;
+    }
 
-            procesarGuardadoDoble({ fecha, kwh, esFallo: false });
-            mostrarAlertaRapida(`Lectura guardada: ${kwh.toFixed(2)} kWh`);
-            document.getElementById('input-kwh').value = '';
-        }
+    const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
+    procesarGuardadoDoble(item);
+    
+    // Mensaje de confirmación solicitado
+    mostrarAlertaRapida(`Se guardo lectura del día ${dateInput}, correctamente`);
+    
+    document.getElementById('input-kwh').value = '';
+}
 
         function marcarErrorLectura() {
-            const fecha = document.getElementById('input-fecha').value;
-            if (!fecha) {
-                mostrarAlertaRapida('Selecciona una fecha.');
+            const dateInput = document.getElementById('input-fecha').value;
+            if (!dateInput) {
+                mostrarAlertaRapida('Selecciona una fecha primero.');
                 return;
             }
-            procesarGuardadoDoble({ fecha, kwh: 0, esFallo: true });
-            mostrarAlertaRapida('Error marcado para ' + fecha);
+
+            const item = { fecha: dateInput, kwh: 0, esFallo: true };
+            procesarGuardadoDoble(item);
         }
 
         function eliminarRegistro(fecha) {
             lecturas = lecturas.filter(l => l.fecha !== fecha);
             localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
             
-            let backup = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            backup = backup.filter(l => l.fecha !== fecha);
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backup));
+            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            backupTotal = backupTotal.filter(l => l.fecha !== fecha);
+            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
 
             renderizarApp();
-            mostrarAlertaRapida('Registro eliminado.');
+            mostrarAlertaRapida('Registro eliminado de la memoria.');
         }
 
+        // LIMPIEZA EXCLUSIVA DE PANTALLA
         function confirmarLimpiezaPantalla() {
-            abrirConfirmacion('¿Limpiar pantalla?', 'Despejará tu panel para un nuevo ciclo. El respaldo está seguro.', 'bg-amber-500 hover:bg-amber-600', 'alert-triangle', function() {
-                lecturas = [];
-                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-                renderizarApp();
-                mostrarAlertaRapida('Pantalla limpia.');
-            });
+            abrirConfirmacion(
+                '¿Limpiar Registros de Pantalla?',
+                'Esto despejará tu panel actual para un nuevo ciclo de facturación. Tu copia de seguridad seguirá intacta en el botón "Cargar Datos".',
+                'bg-amber-500 hover:bg-amber-600',
+                'alert-triangle',
+                function() {
+                    lecturas = [];
+                    localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                    renderizarApp();
+                    mostrarAlertaRapida('Pantalla limpia. Respaldo a salvo.');
+                }
+            );
         }
 
-        function recuperarHistorialCompleto() {
-            const backup = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            if (backup.length === 0) {
-                mostrarAlertaRapida('No hay datos en el respaldo.');
-                return;
-            }
-            lecturas = [...backup];
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-            renderizarApp();
-            mostrarAlertaRapida('¡Historial cargado!');
-        }
-
-        function restaurarUltimoDatosGuardados() {
-            const backup = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            if (backup.length === 0) {
-                mostrarAlertaRapida('No hay datos guardados.');
-                return;
-            }
-            const mapa = {};
-            lecturas.forEach(item => { mapa[item.fecha] = item; });
-            backup.forEach(item => {
-                if (!mapa[item.fecha]) mapa[item.fecha] = item;
-            });
-            lecturas = Object.values(mapa);
-            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
-            renderizarApp();
-            mostrarAlertaRapida('¡Datos restaurados!');
-        }
-
-        function cambiarEde(ede) {
-            edeSeleccionada = ede;
-            localStorage.setItem('ede_seleccionada_v4', ede);
-            renderizarApp();
-        }
-
+        // RESET DE FÁBRICA COMPLETO
         function confirmarReseteo() {
-            abrirConfirmacion('¿Resetear todo?', 'Borrará TODOS los datos. NO se puede deshacer.', 'bg-rose-600 hover:bg-rose-700', 'alert-octagon', function() {
-                localStorage.clear();
-                location.reload();
-            });
+            abrirConfirmacion(
+                '¿Reiniciar de fábrica?',
+                'Esto eliminará permanentemente todos tus datos en pantalla, configuraciones y la copia de seguridad guardada de la memoria local.',
+                'bg-rose-500 hover:bg-rose-600',
+                'alert-octagon',
+                function() {
+                    localStorage.clear();
+                    lecturas = [];
+                    calculosGuardados = [];
+                    edeSeleccionada = 'edenorte';
+                    renderizarApp();
+                    mostrarAlertaRapida('Aplicación totalmente restablecida.');
+                }
+            );
         }
 
-        // ==================== CALCULADORA ====================
+        // CÁLCULO TARIFARIO EXACTO
+        function calcularFactura(totalKwh, edeKey) {
+            const tarifas = tarifasEde[edeKey];
+            const cargoFijo = tarifas.cargoFijo;
+            let desglose = [];
+            let costoTotal = cargoFijo;
+
+            if (totalKwh > 700) {
+                const costoMonobloque = totalKwh * tarifas.monobloque;
+                costoTotal = costoMonobloque + cargoFijo;
+                desglose.push({ rango: `Tarifa Plana Monobloque`, kwh: totalKwh, tasa: tarifas.monobloque, total: costoMonobloque });
+            } else {
+                let kwhRestante = totalKwh;
+                
+                // Rango 1: 0 - 200 kWh
+                const b1 = Math.min(kwhRestante, 200);
+                if (b1 > 0) {
+                    const subtotal = b1 * tarifas.rango1;
+                    costoTotal += subtotal;
+                    desglose.push({ rango: 'Primer tramo', kwh: b1, tasa: tarifas.rango1, total: subtotal });
+                    kwhRestante -= b1;
+                }
+                
+                // Rango 2: 201 - 300 kWh
+                const b2 = Math.min(kwhRestante, 100);
+                if (b2 > 0) {
+                    const subtotal = b2 * tarifas.rango2;
+                    costoTotal += subtotal;
+                    desglose.push({ rango: 'Segundo tramo', kwh: b2, tasa: tarifas.rango2, total: subtotal });
+                    kwhRestante -= b2;
+                }
+                
+                // Rango 3: 301 - 700 kWh
+                const b3 = Math.min(kwhRestante, 400);
+                if (b3 > 0) {
+                    const subtotal = b3 * tarifas.rango3;
+                    costoTotal += subtotal;
+                    desglose.push({ rango: 'Tercer tramo', kwh: b3, tasa: tarifas.rango3, total: subtotal });
+                }
+            }
+            return { costoTotal, cargoFijo, desglose, excedeLimite: totalKwh > 700 };
+        }
+
+        // CALCULADORA MANUAL DESDE LA SEGUNDA PESTAÑA
         function ejecutarCalculadoraManual() {
-            const kwh = parseFloat(document.getElementById('calc-input-kwh').value);
-            if (isNaN(kwh) || kwh < 0) {
-                mostrarAlertaRapida('Ingresa un consumo válido.');
+            const val = parseFloat(document.getElementById('calc-input-kwh').value);
+            if (isNaN(val) || val <= 0) {
+                mostrarAlertaRapida('Ingresa una cantidad de kWh válida.');
                 return;
             }
-            const costo = calcularFactura(kwh, edeSeleccionada);
-            const bloque = document.getElementById('calc-resultado-bloque');
-            const contenido = document.getElementById('calc-resultado-contenido');
-            
-            let html = `<p class="font-bold text-sky-600">Cargo Fijo: RD$ ${tarifasEde[edeSeleccionada].cargoFijo.toFixed(2)}</p>`;
-            costo.desglose.forEach(b => {
-                html += `<div class="bg-slate-50 p-2 rounded"><p>${b.rango}: ${b.kwh.toFixed(0)} kWh × $${b.tasa.toFixed(2)} = <strong>RD$ ${b.total.toFixed(2)}</strong></p></div>`;
+
+            const calc = calcularFactura(val, edeSeleccionada);
+            const contenedor = document.getElementById('calc-resultado-contenido');
+            document.getElementById('calc-resultado-bloque').classList.remove('hidden');
+
+            let html = `
+                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-2">
+                    <p class="text-[10px] text-slate-400 font-bold uppercase">Distribuidora</p>
+                    <p class="font-extrabold text-slate-800">${tarifasEde[edeSeleccionada].nombre}</p>
+                </div>
+                <div class="space-y-1.5 border-t border-slate-100 pt-2">
+                    <div class="flex justify-between"><span>Cargo Fijo Obligatorio:</span><strong>RD$ ${calc.cargoFijo.toFixed(2)}</strong></div>
+            `;
+            calc.desglose.forEach(b => { 
+                html += `<div class="flex justify-between border-b border-slate-50 pb-1"><span>${b.rango} (${b.kwh.toFixed(1)} kWh × RD$ ${b.tasa.toFixed(2)}):</span><strong>RD$ ${b.total.toFixed(2)}</strong></div>`; 
             });
-            html += `<div class="border-t pt-2 mt-2"><p class="font-bold text-lg text-emerald-600">TOTAL: RD$ ${costo.costoTotal.toFixed(2)}</p></div>`;
+            html += `</div><div class="bg-emerald-50 text-emerald-800 p-3 rounded-xl font-bold flex justify-between mt-3 text-sm border border-emerald-100"><span>Total Directo Estimado:</span><span>RD$ ${calc.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span></div>`;
+            contenedor.innerHTML = html;
+        }
+
+        // DETERMINACIÓN DE CICLO SEGÚN DÍA 4
+        function determinarCicloDeLectura(lista) {
+            if (lista.length === 0) return "Del 04/06 al 03/07";
+            const pr = new Date(lista[0].fecha + "T00:00:00");
+            const dia = pr.getDate(), mes = pr.getMonth(), anio = pr.getFullYear();
+            let inicio = dia >= 4 ? new Date(anio, mes, 4) : new Date(anio, mes - 1, 4);
+            let fin = dia >= 4 ? new Date(anio, mes + 1, 3) : new Date(anio, mes, 3);
+            const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
+            return `Del ${fmt(inicio)} al ${fmt(fin)}`;
+        }
+
+        // RENDERIZADO GLOBAL DE LA INTERFAZ
+        function renderizarApp() {
+            // Sincronizar distribuidoras
+            document.querySelectorAll('[id^="ede-"]').forEach(btn => {
+                btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white/80 hover:bg-white/10 active:scale-95";
+            });
+            const activeBtn = document.getElementById(`ede-${edeSeleccionada}`);
+            if (activeBtn) activeBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-md font-extrabold scale-100";
+
+            // Sincronizar copias en el Badge inferior
+            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
+            document.getElementById('badge-guardados').innerText = backupActual.length;
+
+            const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
+            document.getElementById('total-kwh').innerText = totalKwh.toFixed(2);
+
+            const calculo = calcularFactura(totalKwh, edeSeleccionada);
+            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2 })}`;
+
+            document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
+
+            // Progreso gráfico
+            document.getElementById('progreso-texto').innerText = `${totalKwh.toFixed(1)} / 700 kWh`;
+            const bV = document.getElementById('progreso-barra-verde'), bA = document.getElementById('progreso-barra-amarilla'), bR = document.getElementById('progreso-barra-roja');
+            bV.style.width = bA.style.width = bR.style.width = '0%';
             
-            contenido.innerHTML = html;
-            bloque.classList.remove('hidden');
+            if (totalKwh <= 200) {
+                bV.style.width = `${(totalKwh / 700) * 100}%`;
+            } else if (totalKwh <= 300) {
+                bV.style.width = `${(200 / 700) * 100}%`;
+                bA.style.width = `${((totalKwh - 200) / 700) * 100}%`;
+            } else {
+                bV.style.width = `${(200 / 700) * 100}%`;
+                bA.style.width = `${(100 / 700) * 100}%`;
+                bR.style.width = `${(Math.min(totalKwh - 300, 400) / 700) * 100}%`;
+            }
+
+            document.getElementById('rango-ciclo').innerText = determinarCicloDeLectura(lecturas);
+
+            // Filtrado gráfico
+            const filtro = document.getElementById('filtro-lecturas').value;
+            let paraGrafica = [...lecturas];
+            if (filtro === 'con-datos') paraGrafica = paraGrafica.filter(l => !l.esFallo);
+
+            // Estadísticas (Cálculo de Promedio, Proyección, Máximo y Mínimo)
+            const validos = lecturas.filter(l => !l.esFallo && l.kwh > 0);
+            const errores = lecturas.filter(l => l.esFallo);
+            const prom = validos.length > 0 ? (lecturas.reduce((acc, c) => acc + c.kwh, 0) / validos.length) : 0;
+            
+            let maxKwh = 0;
+            let maxFecha = "--/--";
+            let minKwh = 0;
+            let minFecha = "--/--";
+            
+            if (validos.length > 0) {
+                const regMax = validos.reduce((max, op) => op.kwh > max.kwh ? op : max, { kwh: -Infinity });
+                maxKwh = regMax.kwh;
+                if (regMax.fecha) {
+                    const p = regMax.fecha.split('-');
+                    maxFecha = `${p[2]}/${p[1]}`;
+                }
+                
+                const regMin = validos.reduce((min, op) => op.kwh < min.kwh ? op : min, { kwh: Infinity });
+                minKwh = regMin.kwh;
+                if (regMin.fecha) {
+                    const p = regMin.fecha.split('-');
+                    minFecha = `${p[2]}/${p[1]}`;
+                }
+            }
+
+            document.getElementById('stat-promedio').innerText = prom.toFixed(2);
+            document.getElementById('stat-proyeccion').innerText = (prom * 30).toFixed(2);
+            document.getElementById('stat-maximo').innerText = maxKwh.toFixed(2);
+            document.getElementById('stat-maximo-dia').innerText = `Día: ${maxFecha}`;
+            document.getElementById('stat-minimo').innerText = minKwh.toFixed(2);
+            document.getElementById('stat-minimo-dia').innerText = `Día: ${minFecha}`;
+            
+            document.getElementById('stat-dias-activos').innerText = validos.length;
+            document.getElementById('stat-dias-errores').innerText = errores.length;
+
+            // Tabla visual
+            const tbody = document.getElementById('tabla-registros');
+            tbody.innerHTML = '';
+            document.getElementById('tabla-vacia').className = lecturas.length === 0 ? "text-center py-8 text-slate-400 text-xs" : "hidden";
+
+            let acumulado = 0;
+            lecturas.forEach(lec => {
+                acumulado += lec.kwh;
+                const costAcum = calcularFactura(acumulado, edeSeleccionada).costoTotal;
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50/80 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-3 font-semibold text-slate-700">${lec.fecha.split('-')[2]}/${lec.fecha.split('-')[1]}</td>
+                    <td class="py-3 px-3 text-right">${lec.esFallo ? '<span class="text-amber-500 italic font-medium">Fallo</span>' : '<strong>'+lec.kwh.toFixed(2)+' kWh</strong>'}</td>
+                    <td class="py-3 px-3 text-right font-mono text-slate-800">RD$ ${costAcum.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-center">
+                        <button onclick="eliminarRegistro('${lec.fecha}')" class="text-slate-300 hover:text-rose-500 p-1 rounded-full hover:bg-rose-50 transition-all">
+                            <i data-lucide="trash-2" class="w-4 h-4"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // RE-DIBUJAR GRÁFICA DIARIA PREMIUM (IGUAL A LA IMAGEN 1000525024.jpg)
+            const cG = document.getElementById('grafica-contenedor');
+            cG.innerHTML = '';
+
+            if (paraGrafica.length > 0) {
+                const maxVal = Math.max(...paraGrafica.map(l => l.kwh), 15);
+                
+                paraGrafica.forEach(l => {
+                    const p = l.fecha.split('-');
+                    const formattedDate = `${p[2]}/${p[1]}`;
+                    
+                    const col = document.createElement('div');
+                    col.className = "flex flex-col items-center gap-2 min-w-[45px] cursor-pointer group";
+                    
+                    if (l.esFallo) {
+                        col.innerHTML = `
+                            <span class="text-[10px] font-extrabold text-amber-500">--</span>
+                            <div class="w-8 bg-amber-50 border border-dashed border-amber-300 rounded-t-xl h-6 flex items-center justify-center text-amber-500">
+                                <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i>
+                            </div>
+                            <div class="w-full border-t border-slate-200"></div>
+                            <span class="text-[10px] font-bold text-slate-400 tracking-tight">${formattedDate}</span>
+                        `;
+                    } else {
+                        const calcHeight = (l.kwh / maxVal) * 110;
+                        const finalHeight = Math.max(calcHeight, 8);
+                        
+                        col.innerHTML = `
+                            <span class="text-[10.5px] font-black text-[#0284c7] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all">${l.kwh.toFixed(2)}</span>
+                            <div class="w-8 bg-sky-400 rounded-t-xl hover:bg-sky-500 transition-all bar-transition" style="height: ${finalHeight}px"></div>
+                            <div class="w-full border-t border-slate-200"></div>
+                            <span class="text-[10px] font-bold text-slate-400 tracking-tight">${formattedDate}</span>
+                        `;
+                    }
+                    cG.appendChild(col);
+                });
+            } else {
+                cG.innerHTML = `
+                    <div class="w-full text-center py-10 text-slate-400 text-xs font-semibold">
+                        No hay lecturas registradas para graficar.
+                    </div>
+                `;
+            }
+
+            // Actualizar la vista de las tarifas del mes guardadas por si hubo cambios
+            renderizarSeccionGuardados();
+            lucide.createIcons();
+        }
+
+        // TOAST / MENSAJE FLOTANTE EN PANTALLA
+        function mostrarAlertaRapida(msg) {
+            const viejos = document.querySelectorAll('.app-toast');
+            viejos.forEach(v => v.remove());
+
+            const div = document.createElement('div');
+            div.className = "app-toast fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-xs px-4 py-2.5 rounded-full shadow-2xl z-50 transition-all duration-300 opacity-0 transform translate-y-2 font-medium flex items-center gap-2 border border-slate-700/50";
+            div.innerHTML = `<span class="w-1.5 h-1.5 bg-sky-400 rounded-full animate-ping"></span> ${msg}`;
+            document.body.appendChild(div);
+            
+            setTimeout(() => {
+                div.classList.remove('opacity-0', 'translate-y-2');
+                div.classList.add('opacity-100', 'translate-y-0');
+            }, 50);
+
+            setTimeout(() => {
+                div.classList.remove('opacity-100', 'translate-y-0');
+                div.classList.add('opacity-0', 'translate-y-2');
+                setTimeout(() => div.remove(), 300);
+            }, 2300);
         }
     </script>
 </body>
 </html>
+
+
+
