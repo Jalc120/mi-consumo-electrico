@@ -436,6 +436,7 @@
         let modoSeleccionMultiple = false;
         let idsSeleccionados = [];
 
+        // ==================== INICIALIZACIÓN ====================
         window.onload = function() {
             const hoy = new Date();
             document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
@@ -445,6 +446,7 @@
             const savedBackup = localStorage.getItem('copia_seguridad_historial');
             const savedCalculos = localStorage.getItem('calculos_guardados_v4');
             
+            // Inicializar cálculos guardados si no existen
             if (!savedCalculos) {
                 const calculosIniciales = [
                     {
@@ -479,6 +481,7 @@
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
+            // Inicializar lecturas si no existen
             if (!savedBackup && !savedLecturas) {
                 const historialBaseInicial = [
                     { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
@@ -503,6 +506,7 @@
                 localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(historialBaseInicial));
                 lecturas = [...historialBaseInicial];
             } else {
+                // Fusionar backup y activos
                 const backupActual = savedBackup ? JSON.parse(savedBackup) : [];
                 const activosActual = savedLecturas ? JSON.parse(savedLecturas) : [];
                 const mapaLecturas = {};
@@ -514,16 +518,13 @@
                 localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
             }
 
-            if (savedEde) {
-                edeSeleccionada = savedEde;
-            }
+            if (savedEde) edeSeleccionada = savedEde;
             
             renderizarApp();
-            setTimeout(() => {
-                mostrarAlertaRapida('✓ Historial cargado automáticamente');
-            }, 600);
+            setTimeout(() => mostrarAlertaRapida('✓ Historial cargado automáticamente'), 600);
         };
 
+        // ==================== NAVEGACIÓN ====================
         function switchTab(tabId) {
             document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
@@ -556,15 +557,19 @@
             lucide.createIcons();
         }
 
+        // ==================== CÁLCULOS TARIFARIOS ====================
         function calcularFactura(totalKwh, ede) {
             const tarifa = tarifasEde[ede];
             let costo = tarifa.cargoFijo;
             const desglose = [];
 
             if (totalKwh > 700) {
-                desglose.push({ rango: 'Monobloque', kwh: totalKwh, tasa: tarifa.monobloque, total: totalKwh * tarifa.monobloque });
-                costo += totalKwh * tarifa.monobloque;
+                // Monobloque: toda la energía a tasa única
+                const totalMonobloque = totalKwh * tarifa.monobloque;
+                desglose.push({ rango: 'Monobloque (>700)', kwh: totalKwh, tasa: tarifa.monobloque, total: totalMonobloque });
+                costo += totalMonobloque;
             } else {
+                // Rango 1: 0-200 kWh
                 let kwh1 = Math.min(totalKwh, 200);
                 if (kwh1 > 0) {
                     const total1 = kwh1 * tarifa.rango1;
@@ -572,6 +577,7 @@
                     costo += total1;
                 }
 
+                // Rango 2: 201-300 kWh
                 if (totalKwh > 200) {
                     let kwh2 = Math.min(totalKwh - 200, 100);
                     const total2 = kwh2 * tarifa.rango2;
@@ -579,6 +585,7 @@
                     costo += total2;
                 }
 
+                // Rango 3: 301-700 kWh
                 if (totalKwh > 300) {
                     let kwh3 = totalKwh - 300;
                     const total3 = kwh3 * tarifa.rango3;
@@ -590,28 +597,33 @@
             return { costoTotal: costo, desglose };
         }
 
+        // ==================== RENDERIZACIÓN PRINCIPAL ====================
         function renderizarApp() {
             const filtro = document.getElementById('filtro-lecturas').value;
             const lecturasAFiltrar = filtro === 'con-datos' ? lecturas.filter(l => !l.esFallo) : lecturas;
             
             const totalKwh = lecturasAFiltrar.reduce((acc, curr) => acc + curr.kwh, 0);
-            const tarifa = tarifasEde[edeSeleccionada];
             const costo = calcularFactura(totalKwh, edeSeleccionada);
             
+            // Actualizar totales
             document.getElementById('total-kwh').textContent = totalKwh.toFixed(2);
             document.getElementById('total-pesos').textContent = `RD$ ${costo.costoTotal.toFixed(2)}`;
             document.getElementById('progreso-texto').textContent = `${totalKwh.toFixed(0)} / 700 kWh`;
             
+            // Actualizar barra de progreso con colores
             const porcentaje = Math.min(100, (totalKwh / 700) * 100);
             if (porcentaje <= 30) {
+                // Verde: 0-30%
                 document.getElementById('progreso-barra-verde').style.width = porcentaje + '%';
                 document.getElementById('progreso-barra-amarilla').style.width = '0%';
                 document.getElementById('progreso-barra-roja').style.width = '0%';
             } else if (porcentaje <= 80) {
+                // Amarillo: 30-80%
                 document.getElementById('progreso-barra-verde').style.width = '30%';
                 document.getElementById('progreso-barra-amarilla').style.width = (porcentaje - 30) + '%';
                 document.getElementById('progreso-barra-roja').style.width = '0%';
             } else {
+                // Rojo: 80-100%+
                 document.getElementById('progreso-barra-verde').style.width = '30%';
                 document.getElementById('progreso-barra-amarilla').style.width = '50%';
                 document.getElementById('progreso-barra-roja').style.width = (porcentaje - 80) + '%';
@@ -619,6 +631,7 @@
 
             document.getElementById('alerta-exceso').classList.toggle('hidden', totalKwh <= 700);
             
+            // Calcular estadísticas
             const diasActivos = lecturasAFiltrar.filter(l => !l.esFallo).length;
             const diasErrores = lecturasAFiltrar.filter(l => l.esFallo).length;
             const promedioDiario = diasActivos > 0 ? totalKwh / diasActivos : 0;
@@ -643,20 +656,20 @@
                 document.getElementById('stat-minimo-dia').textContent = `Día: ${día}/${mes}`;
             }
 
+            // Renderizar gráfico
             const grafica = document.getElementById('grafica-contenedor');
             grafica.innerHTML = '';
             const maxKwhGrafico = Math.max(...lecturasAFiltrar.map(l => l.kwh), 1);
             
-            lecturasAFiltrar.forEach((lectura, i) => {
+            lecturasAFiltrar.forEach((lectura) => {
                 const altura = (lectura.kwh / maxKwhGrafico) * 150;
-                const fecha = new Date(lectura.fecha);
                 const [año, mes, día] = lectura.fecha.split('-');
                 
                 const barra = document.createElement('div');
                 barra.className = 'flex flex-col items-center gap-2';
                 barra.innerHTML = `
                     <div class="relative group">
-                        <div class="w-8 bar-transition rounded-t-lg transition-all ${lectura.esFallo ? 'bg-slate-300' : 'bg-gradient-to-t from-sky-500 to-cyan-400'}" style="height: ${altura}px;"></div>
+                        <div class="w-8 bar-transition rounded-t-lg ${lectura.esFallo ? 'bg-slate-300' : 'bg-gradient-to-t from-sky-500 to-cyan-400'}" style="height: ${altura}px;"></div>
                         <div class="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-slate-800 text-white text-[10px] px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity z-10">
                             ${lectura.kwh.toFixed(1)} kWh<br>${día}/${mes}
                         </div>
@@ -694,10 +707,8 @@
             }
             tabla.classList.add('hidden');
 
-            let costoAcumulado = 0;
-            lecturas.forEach((lectura, i) => {
+            lecturas.forEach((lectura) => {
                 const costo = calcularFactura(lectura.kwh, edeSeleccionada);
-                costoAcumulado += costo.costoTotal;
                 
                 const fila = document.createElement('tr');
                 fila.className = 'hover:bg-slate-50 transition-colors';
@@ -763,6 +774,7 @@
             lucide.createIcons();
         }
 
+        // ==================== GESTIÓN DE DATOS ====================
         function eliminarTarjetaUnica(id) {
             abrirConfirmacion('¿Eliminar este cálculo?', 'Se borrará permanentemente.', 'bg-rose-500 hover:bg-rose-600', 'alert-octagon', function() {
                 calculosGuardados = calculosGuardados.filter(c => c.id !== id);
@@ -777,6 +789,7 @@
             renderizarSeccionGuardados();
         }
 
+        // ==================== MODALES Y ALERTAS ====================
         function abrirConfirmacion(titulo, desc, colorBtn, icono, callback) {
             document.getElementById('confirm-titulo').innerText = titulo;
             document.getElementById('confirm-descripcion').innerText = desc;
@@ -811,6 +824,7 @@
             }, 2000);
         }
 
+        // ==================== GESTIÓN DE LECTURAS ====================
         function procesarGuardadoDoble(nuevaLectura) {
             const idx = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
             if (idx !== -1) lecturas[idx] = nuevaLectura;
@@ -917,6 +931,7 @@
             });
         }
 
+        // ==================== CALCULADORA ====================
         function ejecutarCalculadoraManual() {
             const kwh = parseFloat(document.getElementById('calc-input-kwh').value);
             if (isNaN(kwh) || kwh < 0) {
