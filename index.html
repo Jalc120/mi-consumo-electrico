@@ -1122,7 +1122,7 @@ body {
             document.getElementById('total-kwh').innerText = totalKwh.toFixed(2);
 
             const calculo = calcularFactura(totalKwh, edeSeleccionada);
-            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2 })}`;
+            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
 
