@@ -67,8 +67,9 @@ body {
                 </button>
                 <h1 class="text-lg font-bold tracking-tight flex items-center gap-1.5">
                     <i data-lucide="zap" class="w-5 h-5 text-amber-300 fill-amber-300"></i>
-                    Consumo Telemedido RD
+                    Consumo Telemedido RD                   
                 </h1>
+                       
                 <div class="bg-white/20 text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Memoria Activa
                 </div>
@@ -115,6 +116,13 @@ body {
                         <div>
                             <p class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Ciclo de Facturación Actual</p>
                             <h4 class="text-sm font-semibold text-sky-400 mt-0.5" id="rango-ciclo">Detectando ciclo...</h4>
+   
+    <!-- INSERTA ESTO JUSTO AQUÍ DEBAJO -->
+    <div id="contador-facturacion" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
+        Cargando días...
+    </div>
+
+
                         </div>
                         <span class="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md">Serial: 76601965</span>
                     </div>
@@ -414,11 +422,10 @@ body {
         <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
     </button>
 </footer>
-<footer class="bg-white/95 backdrop-blur-md border-t border-slate-800 py-3 px-2 flex justify-around items-center text-[20px] font-bold text-slate-500 z-50 pb-safe shadow-[100_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+
+<footer class="bg-white/95 backdrop-blur-md border-t border-slate-800 py-30 px-2 flex justify-around items-center text-[20px] font-bold text-slate-500 z-50 pb-safe shadow-[100_-4px_15px_-3px_rgba(0,0,0,0.05)]">
 </footer>
- <footer class="bg-white/95 backdrop-blur-md border-t border-slate-800 py-3 px-2 flex justify-around items-center text-[20px] font-bold text-slate-500 z-50 pb-safe shadow-[100_-4px_15px_-3px_rgba(0,0,0,0.05)]">
-</footer>
-        
+
     </div>
 
     <!-- MODAL DE CONFIRMACIÓN GENÉRICO -->
@@ -455,7 +462,8 @@ body {
         let modoSeleccionMultiple = false;
         let idsSeleccionados = [];
 
-        window.onload = function() {
+        window.onload = function() { 
+     actualizarContadorFacturacion();
             // Establecer fecha por defecto (hoy)
             const hoy = new Date();
             document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
@@ -1122,7 +1130,7 @@ body {
             document.getElementById('total-kwh').innerText = totalKwh.toFixed(2);
 
             const calculo = calcularFactura(totalKwh, edeSeleccionada);
-            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2,maximumFractionDigits: 2 })}`;
 
             document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
 
@@ -1279,6 +1287,26 @@ body {
                 setTimeout(() => div.remove(), 300);
             }, 2300);
         }
+    // --- NUEVA FUNCIÓN DE FACTURACIÓN ---
+ function actualizarContadorFacturacion() {
+    const hoy = new Date();
+    const diaCorte = 3;
+    let proximoCorte = new Date(hoy.getFullYear(), hoy.getMonth(), diaCorte);
+
+    // Si hoy ya pasó el día 3, el próximo corte es el mes siguiente
+    if (hoy.getDate() >= diaCorte) {
+        proximoCorte.setMonth(proximoCorte.getMonth() + 1);
+    }
+
+    const diferenciaTiempo = proximoCorte - hoy;
+    const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+    
+    const elemento = document.getElementById('contador-facturacion');
+    if (elemento) {
+        elemento.innerText = diasRestantes === 0 ? "¡Corte hoy!" : `${diasRestantes} días para el corte`;
+    }
+}
+
     </script>
 </body>
 </html>
