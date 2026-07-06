@@ -3,7 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
     <title>Consumo Diario Telemedido - EDEs</title>
     
     <!-- Soporte para Web App Movil (PWA/Home Screen) -->
@@ -11,10 +10,8 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Consumo RD">
     
-    <!-- Icono Autocontenido para Pantalla de Inicio en iPhone (Apple Touch Icon) -->
+    <!-- Iconos -->
     <link rel="apple-touch-icon" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><circle cx='256' cy='256' r='170' fill='none' stroke='white' stroke-width='5' stroke-dasharray='25 15' opacity='0.3'/><path d='M 80 256 L 140 256 L 180 160 L 220 340 L 260 100 L 300 400 L 340 200 L 380 256 L 432 256' fill='none' stroke='%2322d3ee' stroke-width='10' opacity='0.5'/><path d='M 290 60 L 150 270 L 250 270 L 222 452 L 362 242 L 262 242 Z' fill='%23fbbf24'/></svg>">
-    
-    <!-- Icono Autocontenido para Navegadores/Android (Favicon) -->
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='115' fill='%230891b2'/><circle cx='256' cy='256' r='170' fill='none' stroke='white' stroke-width='5' stroke-dasharray='25 15' opacity='0.3'/><path d='M 80 256 L 140 256 L 180 160 L 220 340 L 260 100 L 300 400 L 340 200 L 380 256 L 432 256' fill='none' stroke='%2322d3ee' stroke-width='10' opacity='0.5'/><path d='M 290 60 L 150 270 L 250 270 L 222 452 L 362 242 L 262 242 Z' fill='%23fbbf24'/></svg>">
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -24,39 +21,18 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f1f5f9;
+            padding-bottom: env(safe-area-inset-bottom);
         }
-        .custom-scrollbar::-webkit-scrollbar {
-            height: 6px;
-            width: 6px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: #f1f5f9;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 10px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
-        }
-        /* Transición suave para las barras de la gráfica */
-        .bar-transition {
-            transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .pb-safe {
-    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom));
-        }
-
-body {
-    padding-bottom: env(safe-area-inset-bottom);
-}   
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .bar-transition { transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
+        .pb-safe { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
     </style>
 </head>
-     <!-- Cambia el body a esto -->
 <body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
 
-    <!-- Cambia el contenedor principal para que tenga altura completa -->
     <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60">
 
         <!-- HEADER -->
@@ -69,7 +45,6 @@ body {
                     <i data-lucide="zap" class="w-5 h-5 text-amber-300 fill-amber-300"></i>
                     Consumo Telemedido RD                   
                 </h1>
-                       
                 <div class="bg-white/20 text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Memoria Activa
                 </div>
@@ -78,21 +53,15 @@ body {
             <div class="mt-4">
                 <label class="block text-[10px] uppercase tracking-wider text-cyan-100 font-bold mb-1.5">Distribuidora Eléctrica</label>
                 <div class="grid grid-cols-3 gap-2 bg-black/15 p-1 rounded-xl">
-                    <button id="ede-edenorte" onclick="cambiarEde('edenorte')" class="py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm">
-                        EDENORTE
-                    </button>
-                    <button id="ede-edesur" onclick="cambiarEde('edesur')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
-                        EDESUR
-                    </button>
-                    <button id="ede-edeeste" onclick="cambiarEde('edeeste')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">
-                        EDEESTE
-                    </button>
+                    <button id="ede-edenorte" onclick="cambiarEde('edenorte')" class="py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-sm">EDENORTE</button>
+                    <button id="ede-edesur" onclick="cambiarEde('edesur')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">EDESUR</button>
+                    <button id="ede-edeeste" onclick="cambiarEde('edeeste')" class="py-2 text-xs font-bold rounded-lg transition-all text-center text-white hover:bg-white/10">EDEESTE</button>
                 </div>
             </div>
         </header>
 
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-10">
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-24">
             
             <!-- VISTA: CONSUMO (PRINCIPAL) -->
             <div id="view-consumo" class="tab-view space-y-5">
@@ -115,14 +84,10 @@ body {
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <p class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Ciclo de Facturación Actual</p>
-                            <h4 class="text-sm font-semibold text-sky-400 mt-0.5" id="rango-ciclo">Detectando ciclo...</h4>
-   
-    <!-- INSERTA ESTO JUSTO AQUÍ DEBAJO -->
-    <div id="contador-facturacion" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full">
-        Cargando días...
-    </div>
-
-
+                            <h4 class="text-sm font-semibold text-sky-400 mt-0.5 mb-2" id="rango-ciclo">Detectando ciclo...</h4>
+                            <div id="contador-facturacion" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full inline-block">
+                                Cargando días...
+                            </div>
                         </div>
                         <span class="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md">Serial: 76601965</span>
                     </div>
@@ -162,7 +127,7 @@ body {
                     <div class="flex justify-between items-center mb-4">
                         <div>
                             <h3 class="text-sm font-extrabold text-slate-800">Consumo Diario (kWh)</h3>
-                            <p class="text-[11px] text-slate-500 font-medium font-semibold">Desliza para ver todo el historial</p>
+                            <p class="text-[11px] text-slate-500 font-semibold">Desliza para ver todo el historial</p>
                         </div>
                         <select id="filtro-lecturas" onchange="renderizarApp()" class="text-xs bg-slate-50 border border-slate-200 rounded-lg py-1 px-2.5 font-bold text-slate-600 focus:ring-1 focus:ring-sky-500 focus:outline-none">
                             <option value="todos">Mostrar Todo</option>
@@ -237,7 +202,7 @@ body {
                         <div class="w-px h-5 bg-slate-200"></div>
                         <div class="flex items-center gap-1.5">
                             <i data-lucide="alert-circle" class="w-4.5 h-4.5 text-amber-500"></i>
-                            <span>Errores de lectura: <strong class="text-slate-700 text-sm font-extrabold ml-0.5" id="stat-dias-errores">0</strong></span>
+                            <span>Errores: <strong class="text-slate-700 text-sm font-extrabold ml-0.5" id="stat-dias-errores">0</strong></span>
                         </div>
                     </div>
                 </div>
@@ -298,9 +263,6 @@ body {
                         </div>
                     </div>
                 </div>
-  <div class="bg-white rounded-8xl p-4 border border-slate-150 shadow-sm">
-<tbody>___________________<</tbody>
- </div>
             </div>
 
             <!-- VISTA: CALCULADORA -->
@@ -322,7 +284,6 @@ body {
                         </button>
                     </div>
 
-                    <!-- Resultado de la calculadora manual -->
                     <div id="calc-resultado-bloque" class="hidden border-t border-slate-100 pt-4 space-y-3">
                         <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Desglose de Facturación Directa</h4>
                         <div id="calc-resultado-contenido" class="space-y-2 text-xs"></div>
@@ -330,13 +291,12 @@ body {
                 </div>
             </div>
 
-            <!-- VISTA: TARIFA DEL MES (IDÉNTICO A LA FOTO 1000525050.jpg) -->
+            <!-- VISTA: TARIFA DEL MES -->
             <div id="view-tarifa" class="tab-view hidden space-y-5">
                 <div class="bg-gradient-to-r from-cyan-400/10 to-sky-400/10 rounded-2xl p-4 text-center border border-cyan-100">
                     <h2 class="text-lg font-black text-sky-800">Tarifa del Mes</h2>
                 </div>
 
-                <!-- Toggles de Navegación del Historial -->
                 <div class="grid grid-cols-2 gap-2 bg-slate-100 p-1.5 rounded-2xl">
                     <button id="btn-toggle-tarifas" onclick="cambiarSeccionTarifa('tarifas')" class="py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm">
                         Tarifas Actuales
@@ -365,15 +325,13 @@ body {
                     </div>
                 </div>
 
-                <!-- SECCIÓN: CÁLCULOS GUARDADOS (FOTO DE COMPORTAMIENTO) -->
+                <!-- SECCIÓN: CÁLCULOS GUARDADOS -->
                 <div id="sec-calculos-guardados" class="hidden space-y-4">
                     <div class="flex justify-between items-center">
                         <button id="btn-multiple-select" onclick="toggleSeleccionMultiple()" class="w-full bg-sky-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-sky-600 transition-colors shadow-md shadow-sky-100 flex items-center justify-center gap-1.5">
                             <i data-lucide="check-square" class="w-4 h-4"></i> Seleccionar Múltiples
                         </button>
                     </div>
-
-                    <!-- Listado dinámico de cálculos de mes -->
                     <div id="lista-calculos-contenedor" class="space-y-4"></div>
                 </div>
             </div>
@@ -401,41 +359,30 @@ body {
         </main>
 
         <!-- BARRA INFERIOR (4 OPCIONES) -->
-        
-<!-- <footer class="bg-white/95 backdrop-blur-md border-t border-slate-200 py-3 px-2 flex justify-around items-center text-[16px] font-bold text-slate-400 z-50 pb-safe shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]"> -->
-<footer class="fixed bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
-    
-    <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 transition-all active:scale-90 w-16">
-        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-        <span>Consumo</span>
-    </button>
-    
-    <button id="tab-btn-calculadora" onclick="switchTab('calculadora')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
-        <i data-lucide="calculator" class="w-6 h-6"></i>
-        <span>Calculadora</span>
-    </button>
-    
-    <button id="tab-btn-tarifa" onclick="switchTab('tarifa')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
-        <i data-lucide="receipt" class="w-6 h-6"></i>
-        <span>Tarifa</span>
-    </button>
-    
-    <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative">
-        <i data-lucide="database" class="w-6 h-6"></i>
-        <span>Cargar</span>
-        <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
-    </button>
-</footer>
-<footer class="bg-white/95 backdrop-blur-md border-t border-slate-800 py-30 px-2 flex justify-around items-center text-[20px] font-bold text-slate-500 z-50 pb-safe shadow-[100_-4px_15px_-3px_rgba(0,0,0,0.05)]">
-</footer>
-<footer class="bg-white/95 backdrop-blur-md border-t border-slate-800 py-30 px-2 flex justify-around items-center text-[20px] font-bold text-slate-500 z-50 pb-safe shadow-[100_-4px_15px_-3px_rgba(0,0,0,0.05)]">
-</footer>
-
+        <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+            <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16">
+                <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                <span>Consumo</span>
+            </button>
+            <button id="tab-btn-calculadora" onclick="switchTab('calculadora')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
+                <i data-lucide="calculator" class="w-6 h-6"></i>
+                <span>Calculadora</span>
+            </button>
+            <button id="tab-btn-tarifa" onclick="switchTab('tarifa')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
+                <i data-lucide="receipt" class="w-6 h-6"></i>
+                <span>Tarifa</span>
+            </button>
+            <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative">
+                <i data-lucide="database" class="w-6 h-6"></i>
+                <span>Cargar</span>
+                <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
+            </button>
+        </footer>
     </div>
 
-    <!-- MODAL DE CONFIRMACIÓN GENÉRICO -->
+    <!-- MODAL DE CONFIRMACIÓN -->
     <div id="modal-confirmacion" class="hidden fixed inset-0 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-slate-100 animate-fade-in">
+        <div class="bg-white rounded-3xl w-full max-w-sm p-6 space-y-4 shadow-2xl border border-slate-100">
             <div class="text-center space-y-2">
                 <div class="mx-auto w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2" id="confirm-icon-wrapper">
                     <i data-lucide="alert-triangle" class="w-6 h-6" id="confirm-icon"></i>
@@ -463,28 +410,26 @@ body {
         let lecturas = [];
         let calculosGuardados = [];
         let callbackConfirmacion = null;
-        let seccionTarifaActiva = 'tarifas'; // 'tarifas' o 'guardados'
+        let seccionTarifaActiva = 'tarifas';
         let modoSeleccionMultiple = false;
         let idsSeleccionados = [];
 
         window.onload = function() { 
-     actualizarContadorFacturacion();
-            // Establecer fecha por defecto (hoy)
+            actualizarContadorFacturacion();
+            
             const hoy = new Date();
             document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
             
-            // CARGAR LECTURAS ACTIVAS DEL ÚLTIMO ACCESO
             const savedLecturas = localStorage.getItem('lecturas_ciclo_actual');
             const savedEde = localStorage.getItem('ede_seleccionada_v4');
             const savedBackup = localStorage.getItem('copia_seguridad_historial');
             const savedCalculos = localStorage.getItem('calculos_guardados_v4');
             
-            // Inicializar cálculos guardados por defecto con los valores exactos de la imagen si no existen
             if (!savedCalculos) {
                 const calculosIniciales = [
                     {
                         id: 1,
-                        fecha: '05/04/2026',
+                        fecha: '04/05/2026 - 03/06/2026',
                         lecturaAnterior: 7621,
                         lecturaActual: 7891,
                         consumo: 270,
@@ -493,66 +438,27 @@ body {
                             { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
                             { rango: 'Segundo tramo', kwh: 70, tasa: 8.51, total: 595.70 }
                         ]
-                    },
-                    {
-                        id: 2,
-                        fecha: '05/03/2026',
-                        lecturaAnterior: 7335,
-                        lecturaActual: 7621,
-                        consumo: 286,
-                        costo: 2052.67,
-                        desglose: [
-                            { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
-                            { rango: 'Segundo tramo', kwh: 86, tasa: 8.51, total: 731.86 }
-                        ]
-                    },
-                    {
-                        id: 3,
-                        fecha: '05/02/2026',
-                        lecturaAnterior: 7037,
-                        lecturaActual: 7335,
-                        consumo: 298,
-                        costo: 2154.79,
-                        desglose: [
-                            { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
-                            { rango: 'Segundo tramo', kwh: 98, tasa: 8.51, total: 833.98 }
-                        ]
                     }
                 ];
                 localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosIniciales));
                 calculosGuardados = calculosIniciales;
-                // Inicializar lectura base última en 7891
                 localStorage.setItem('lectura_base_v4', '7891');
             } else {
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
-            // Si el almacenamiento de lecturas diarias está completamente vacío
             if (!savedBackup && !savedLecturas) {
                 const historialBaseInicial = [
                     { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
                     { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
                     { fecha: '2026-06-06', kwh: 9.09, esFallo: false },
                     { fecha: '2026-06-07', kwh: 8.51, esFallo: false },
-                    { fecha: '2026-06-08', kwh: 10.95, esFallo: false },
-                    { fecha: '2026-06-09', kwh: 14.44, esFallo: false },
-                    { fecha: '2026-06-10', kwh: 17.30, esFallo: false },
-                    { fecha: '2026-06-11', kwh: 10.41, esFallo: false },
-                    { fecha: '2026-06-12', kwh: 10.19, esFallo: false },
-                    { fecha: '2026-06-13', kwh: 10.47, esFallo: false },
-                    { fecha: '2026-06-14', kwh: 16.04, esFallo: false },
-                    { fecha: '2026-06-15', kwh: 0.00, esFallo: true }, 
-                    { fecha: '2026-06-16', kwh: 0.00, esFallo: true }, 
-                    { fecha: '2026-06-17', kwh: 13.56, esFallo: false },
-                    { fecha: '2026-06-18', kwh: 11.90, esFallo: false },
-                    { fecha: '2026-06-19', kwh: 16.22, esFallo: false },
-                    { fecha: '2026-06-20', kwh: 9.31, esFallo: false }
+                    { fecha: '2026-06-08', kwh: 10.95, esFallo: false }
                 ];
                 localStorage.setItem('copia_seguridad_historial', JSON.stringify(historialBaseInicial));
                 localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(historialBaseInicial));
                 lecturas = [...historialBaseInicial];
             } else {
-                // Fusión de memoria
                 const backupActual = savedBackup ? JSON.parse(savedBackup) : [];
                 const activosActual = savedLecturas ? JSON.parse(savedLecturas) : [];
                 
@@ -567,40 +473,115 @@ body {
                 localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
             }
 
-            // Cargar distribuidora preferida
-            if (savedEde) {
-                edeSeleccionada = savedEde;
-            }
+            if (savedEde) edeSeleccionada = savedEde;
             
             renderizarApp();
-
-            setTimeout(() => {
-                mostrarAlertaRapida('✓ Historial completo cargado automáticamente');
-            }, 600);
+            
+            // Ejecutar el limpiador automático cada vez que se carga la página
+            setTimeout(verificarCierreCiclo, 800);
         };
 
-        // GESTIÓN DE NAVEGACIÓN EN PESTAÑAS (FOOTER)
+        // ====== NUEVO: LIMPIADOR Y GUARDADO AUTOMÁTICO (DÍA 6) ======
+        function verificarCierreCiclo() {
+            const hoy = new Date();
+            const diaActual = hoy.getDate();
+            const mesActual = hoy.getMonth(); 
+            const anioActual = hoy.getFullYear();
+
+            // Ejecuta sólo si estamos en el día 6 o posterior del mes
+            if (diaActual >= 6) {
+                // Definimos el ciclo que acaba de pasar (4 del mes pasado al 3 del mes actual)
+                let anioInicio = anioActual;
+                let mesInicio = mesActual - 1;
+                
+                if (mesInicio < 0) {
+                    mesInicio = 11;
+                    anioInicio--;
+                }
+
+                const fechaFinCiclo = new Date(anioActual, mesActual, 3, 23, 59, 59);
+                const claveCiclo = `04/${String(mesInicio + 1).padStart(2, '0')}/${anioInicio} - 03/${String(mesActual + 1).padStart(2, '0')}/${anioActual}`;
+
+                // Verifica si este ciclo ya fue archivado
+                const yaGuardado = calculosGuardados.some(c => c.fecha === claveCiclo);
+
+                if (!yaGuardado && lecturas.length > 0) {
+                    // Obtener todas las lecturas registradas hasta el día 3
+                    const lecturasCicloAnterior = lecturas.filter(l => {
+                        const partes = l.fecha.split('-');
+                        const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
+                        return fechaLectura <= fechaFinCiclo;
+                    });
+
+                    if (lecturasCicloAnterior.length > 0) {
+                        const totalKwh = lecturasCicloAnterior.reduce((acc, curr) => acc + curr.kwh, 0);
+
+                        if (totalKwh > 0) {
+                            const calculoTarifa = calcularFactura(totalKwh, edeSeleccionada);
+                            let lecturaBase = parseFloat(localStorage.getItem('lectura_base_v4') || '7891');
+                            const anterior = lecturaBase;
+                            const actual = anterior + totalKwh;
+
+                            const nuevoRegistroMes = {
+                                id: Date.now(),
+                                fecha: claveCiclo,
+                                lecturaAnterior: anterior,
+                                lecturaActual: actual,
+                                consumo: totalKwh,
+                                costo: calculoTarifa.costoTotal,
+                                desglose: calculoTarifa.desglose.map(b => ({
+                                    rango: b.rango,
+                                    kwh: b.kwh,
+                                    tasa: b.tasa,
+                                    total: b.total
+                                }))
+                            };
+
+                            // Guardar en Tarifas > Cálculos guardados
+                            calculosGuardados.unshift(nuevoRegistroMes);
+                            localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
+                            localStorage.setItem('lectura_base_v4', actual.toString());
+
+                            // LIMPIEZA AUTOMÁTICA DE LA PANTALLA
+                            // Mantenemos SOLO las lecturas que sean del día 4 en adelante del mes actual
+                            lecturas = lecturas.filter(l => {
+                                const partes = l.fecha.split('-');
+                                const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
+                                return fechaLectura > fechaFinCiclo;
+                            });
+
+                            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+
+                            abrirConfirmacion(
+                                '¡Ciclo Auto-Guardado y Limpiado!',
+                                `Se ha detectado tu periodo de facturación (Día 6). El consumo de ${totalKwh.toFixed(1)} kWh del ciclo pasado se archivó en 'Cálculos Guardados' y la pantalla ha sido limpiada automáticamente para iniciar tu nuevo ciclo.`,
+                                'bg-emerald-500 hover:bg-emerald-600',
+                                'check-circle-2',
+                                function() { renderizarApp(); }
+                            );
+                            
+                            // Aseguramos que cambie el icono a verde para el mensaje de éxito
+                            document.getElementById('confirm-icon-wrapper').className = "mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2";
+                            document.getElementById('confirm-icon').setAttribute('data-lucide', 'check-circle-2');
+                            lucide.createIcons();
+                        }
+                    }
+                }
+            }
+        }
+        // ====================================================
+
         function switchTab(tabId) {
-            // Ocultar todas las vistas
-            document.querySelectorAll('.tab-view').forEach(view => {
-                view.classList.add('hidden');
-            });
-            
-            // Mostrar vista seleccionada
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
             document.getElementById(`view-${tabId}`).classList.remove('hidden');
             
-            // Resetear estilos de botones footer
             document.querySelectorAll('footer button').forEach(btn => {
-                btn.className = "flex flex-col items-center gap-1 hover:text-slate-600 transition-colors relative";
+                btn.className = "flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative text-slate-400";
             });
-            
-            // Destacar botón activo
-            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1 text-sky-500 font-bold transition-all relative";
-            
+            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16 relative";
             lucide.createIcons();
         }
 
-        // TARIFA DEL MES: CAMBIO DE SECCIÓN INTERNA
         function cambiarSeccionTarifa(seccion) {
             seccionTarifaActiva = seccion;
             const btnTarifas = document.getElementById('btn-toggle-tarifas');
@@ -625,72 +606,6 @@ body {
             lucide.createIcons();
         }
 
-        // COMPORTAMIENTO GUARDADO AUTOMÁTICO EN DÍA 5
-        function evaluarGuardadoAutomaticoDia5(lecturaNueva) {
-            if (!lecturaNueva || lecturaNueva.esFallo) return;
-
-            const partes = lecturaNueva.fecha.split('-');
-            const dia = parseInt(partes[2]);
-            const mes = partes[1];
-            const anio = partes[0];
-
-            // Si es exactamente día 5 de cualquier mes
-            if (dia === 5) {
-                const claveFecha = `05/${mes}/${anio}`;
-                
-                // Verificar si ya ha sido archivado este mes
-                const yaArchivado = calculosGuardados.some(c => c.fecha === claveFecha);
-                if (!yaArchivado) {
-                    const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
-                    if (totalKwh <= 1) return; // Evitar archivar ciclos vacíos o con consumos insignificantes
-
-                    const calculoTarifa = calcularFactura(totalKwh, edeSeleccionada);
-                    
-                    // Recuperar el histórico de lecturas del medidor
-                    let lecturaBase = parseFloat(localStorage.getItem('lectura_base_v4') || '7891');
-                    const anterior = lecturaBase;
-                    const actual = anterior + totalKwh;
-
-                    const nuevoRegistroMes = {
-                        id: Date.now(),
-                        fecha: claveFecha,
-                        lecturaAnterior: anterior,
-                        lecturaActual: actual,
-                        consumo: totalKwh,
-                        costo: calculoTarifa.costoTotal,
-                        desglose: calculoTarifa.desglose.map(b => ({
-                            rango: b.rango,
-                            kwh: b.kwh,
-                            tasa: b.tasa,
-                            total: b.total
-                        }))
-                    };
-
-                    calculosGuardados.unshift(nuevoRegistroMes);
-                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
-                    localStorage.setItem('lectura_base_v4', actual.toString());
-
-                    renderizarApp();
-                    
-                    setTimeout(() => {
-                        abrirConfirmacion(
-                            '¡Ciclo Auto-Guardado!',
-                            `Se ha completado el Día 5 de cobro. El ciclo se archivó automáticamente por fecha con un total de ${totalKwh.toFixed(1)} kWh (RD$ ${calculoTarifa.costoTotal.toFixed(2)}). ¿Deseas limpiar la pantalla para comenzar el nuevo ciclo de consumo?`,
-                            'bg-sky-500 hover:bg-sky-600',
-                            'alert-triangle',
-                            function() {
-                                lecturas = [];
-                                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-                                renderizarApp();
-                                mostrarAlertaRapida('Pantalla despejada para el nuevo mes.');
-                            }
-                        );
-                    }, 1000);
-                }
-            }
-        }
-
-        // CONTROL DE SELECCIÓN MÚLTIPLE (ELIMINAR EN LOTE)
         function toggleSeleccionMultiple() {
             modoSeleccionMultiple = !modoSeleccionMultiple;
             idsSeleccionados = [];
@@ -711,17 +626,12 @@ body {
             if (!modoSeleccionMultiple) return;
             
             const index = idsSeleccionados.indexOf(id);
-            if (index > -1) {
-                idsSeleccionados.splice(index, 1);
-            } else {
-                idsSeleccionados.push(id);
-            }
+            if (index > -1) idsSeleccionados.splice(index, 1);
+            else idsSeleccionados.push(id);
 
-            // Actualizar botón eliminar
             const btn = document.getElementById('btn-multiple-select');
             btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Seleccionados (${idsSeleccionados.length})`;
             
-            // Actualizar diseño de la tarjeta seleccionada
             const cardEl = document.getElementById(`card-guardado-${id}`);
             if (idsSeleccionados.includes(id)) {
                 cardEl.classList.add('border-sky-500', 'bg-sky-50/20');
@@ -733,7 +643,7 @@ body {
         function eliminarTarjetaUnica(id) {
             abrirConfirmacion(
                 '¿Eliminar este cálculo?',
-                'Se borrará de forma permanente de tu historial de Tarifas del Mes.',
+                'Se borrará de forma permanente de tu historial.',
                 'bg-rose-500 hover:bg-rose-600',
                 'alert-octagon',
                 function() {
@@ -745,16 +655,12 @@ body {
             );
         }
 
-        // RENDERIZAR LISTADO DE CÁLCULOS GUARDADOS (IGUAL A LA IMAGEN)
         function renderizarSeccionGuardados() {
             const contenedor = document.getElementById('lista-calculos-contenedor');
             contenedor.innerHTML = '';
 
             if (calculosGuardados.length === 0) {
-                contenedor.innerHTML = `
-                    <div class="text-center py-10 text-slate-400 text-xs font-medium">
-                        No hay cálculos archivados en este dispositivo.
-                    </div>`;
+                contenedor.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs font-medium">No hay cálculos archivados.</div>`;
                 return;
             }
 
@@ -780,10 +686,10 @@ body {
                                     ${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
                                 </div>` : ''
                             }
-                            <span class="text-sm font-extrabold text-[#0284c7]">Fecha: ${item.fecha}</span>
+                            <span class="text-[11px] sm:text-xs font-extrabold text-[#0284c7]">Ciclo: ${item.fecha}</span>
                         </div>
                         <div class="flex items-center gap-2.5">
-                            <span class="text-base font-extrabold text-[#10b981]">$${item.costo.toFixed(2)}</span>
+                            <span class="text-sm sm:text-base font-extrabold text-[#10b981]">$${item.costo.toFixed(2)}</span>
                             ${!modoSeleccionMultiple ? `
                                 <button onclick="event.stopPropagation(); eliminarTarjetaUnica(${item.id})" class="text-rose-500 p-1 hover:bg-rose-50 rounded-lg transition-colors">
                                     <i data-lucide="trash-2" class="w-4 h-4"></i>
@@ -806,7 +712,6 @@ body {
             lucide.createIcons();
         }
 
-        // CONFIRMAR ELIMINACIÓN DE SELECCIÓN MÚLTIPLE
         function ejecutarEliminarLote() {
             if (idsSeleccionados.length === 0) {
                 mostrarAlertaRapida('Por favor, selecciona al menos un cálculo.');
@@ -814,32 +719,29 @@ body {
             }
             abrirConfirmacion(
                 '¿Eliminar los elementos?',
-                `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos seleccionados de forma irreversible?`,
+                `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos de forma irreversible?`,
                 'bg-rose-500 hover:bg-rose-600',
                 'alert-octagon',
                 function() {
                     calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
                     localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
                     toggleSeleccionMultiple();
-                    mostrarAlertaRapida('Elementos eliminados correctamente.');
+                    mostrarAlertaRapida('Elementos eliminados.');
                 }
             );
         }
 
-        // Sobrescribir el botón proceder para selección múltiple
         document.getElementById('confirm-btn-proceder').onclick = function() {
             if (callbackConfirmacion) callbackConfirmacion();
             cerrarModalConfirmacion();
         };
 
-        // GESTIÓN DE MODALES DE CONFIRMACIÓN (Alternativa a alert/confirm)
         function abrirConfirmacion(titulo, desc, colorBtn, icono, callback) {
             document.getElementById('confirm-titulo').innerText = titulo;
             document.getElementById('confirm-descripcion').innerText = desc;
             
             const btn = document.getElementById('confirm-btn-proceder');
             
-            // Si es eliminación en lote
             if (modoSeleccionMultiple && idsSeleccionados.length > 0 && callbackConfirmacion === ejecutarEliminarLote) {
                 btn.onclick = function() {
                     ejecutarEliminarLote();
@@ -852,29 +754,32 @@ body {
                 };
             }
 
-            btn.className = `w-full text-white py-2 rounded-xl text-xs font-bold transition-colors ${colorBtn}`;
+            btn.className = `w-full text-white py-2.5 rounded-xl text-xs font-bold transition-colors ${colorBtn}`;
             
             const iconWrap = document.getElementById('confirm-icon-wrapper');
             if (colorBtn.includes('rose') || colorBtn.includes('red')) {
                 iconWrap.className = "mx-auto w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2";
                 document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-octagon');
+            } else if(colorBtn.includes('emerald') || colorBtn.includes('green')){
+                iconWrap.className = "mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2";
+                document.getElementById('confirm-icon').setAttribute('data-lucide', 'check-circle-2');
             } else {
                 iconWrap.className = "mx-auto w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2";
                 document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-triangle');
             }
             
+            if(icono) document.getElementById('confirm-icon').setAttribute('data-lucide', icono);
+
             lucide.createIcons();
             callbackConfirmacion = callback;
             document.getElementById('modal-confirmacion').classList.remove('hidden');
         }
 
-        // Modificar para vincular botón procediente de eliminación múltiple
-        const proceedOriginal = document.getElementById('btn-multiple-select').onclick;
         document.getElementById('btn-multiple-select').onclick = function() {
             if (modoSeleccionMultiple && idsSeleccionados.length > 0) {
                 abrirConfirmacion(
                     '¿Eliminar los elementos?',
-                    `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos seleccionados de forma irreversible?`,
+                    `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos de forma irreversible?`,
                     'bg-rose-500 hover:bg-rose-600',
                     'alert-octagon',
                     function() {
@@ -894,7 +799,6 @@ body {
             callbackConfirmacion = null;
         }
 
-        // RESPALDO DE HISTORIAL COMPLETO
         function recuperarHistorialCompleto() {
             const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
             if (backupActual.length === 0) {
@@ -907,20 +811,17 @@ body {
             mostrarAlertaRapida('¡Historial completo cargado!');
         }
 
-        // RESTAURAR ÚLTIMO DATOS GUARDADO (Fusión inteligente)
         function restaurarUltimoDatosGuardados() {
             const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
             if (backupActual.length === 0) {
-                mostrarAlertaRapida('No hay datos guardados en la copia de seguridad.');
+                mostrarAlertaRapida('No hay datos en la copia de seguridad.');
                 return;
             }
             
             const mapaLecturas = {};
             lecturas.forEach(item => { mapaLecturas[item.fecha] = item; });
             backupActual.forEach(item => {
-                if (!mapaLecturas[item.fecha]) {
-                    mapaLecturas[item.fecha] = item;
-                }
+                if (!mapaLecturas[item.fecha]) mapaLecturas[item.fecha] = item;
             });
             
             lecturas = Object.values(mapaLecturas);
@@ -930,7 +831,7 @@ body {
             localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
             
             renderizarApp();
-            mostrarAlertaRapida('¡Último datos restaurados y fusionados con éxito!');
+            mostrarAlertaRapida('¡Últimos datos restaurados!');
         }
 
         function cambiarEde(edeKey) {
@@ -939,16 +840,13 @@ body {
             renderizarApp();
         }
 
-        // GUARDADO EN TIEMPO REAL COOPERATIVO
         function procesarGuardadoDoble(nuevaLectura) {
-            // 1. Guardar en vista activa de pantalla
             const idxCiclo = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
             if (idxCiclo !== -1) lecturas[idxCiclo] = nuevaLectura;
             else lecturas.push(nuevaLectura);
             lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
             localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
 
-            // 2. Guardar en copia de seguridad de forma paralela
             let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
             const idxBackup = backupTotal.findIndex(l => l.fecha === nuevaLectura.fecha);
             if (idxBackup !== -1) backupTotal[idxBackup] = nuevaLectura;
@@ -957,28 +855,23 @@ body {
             localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
 
             renderizarApp();
-
-            // Evaluar si esta nueva lectura gatilla el Guardado Automático del Día 5
-            evaluarGuardadoAutomaticoDia5(nuevaLectura);
         }
 
-     function agregarConsumo() {
-    const dateInput = document.getElementById('input-fecha').value;
-    const kwhInput = parseFloat(document.getElementById('input-kwh').value);
+        function agregarConsumo() {
+            const dateInput = document.getElementById('input-fecha').value;
+            const kwhInput = parseFloat(document.getElementById('input-kwh').value);
 
-    if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
-        mostrarAlertaRapida('Por favor, ingresa valores válidos.');
-        return;
-    }
+            if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
+                mostrarAlertaRapida('Por favor, ingresa valores válidos.');
+                return;
+            }
 
-    const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
-    procesarGuardadoDoble(item);
-    
-    // Mensaje de confirmación solicitado
-    mostrarAlertaRapida(`Se guardo lectura del día ${dateInput}, correctamente`);
-    
-    document.getElementById('input-kwh').value = '';
-}
+            const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
+            procesarGuardadoDoble(item);
+            
+            mostrarAlertaRapida(`Lectura del día ${dateInput} guardada correctamente`);
+            document.getElementById('input-kwh').value = '';
+        }
 
         function marcarErrorLectura() {
             const dateInput = document.getElementById('input-fecha').value;
@@ -1003,11 +896,10 @@ body {
             mostrarAlertaRapida('Registro eliminado de la memoria.');
         }
 
-        // LIMPIEZA EXCLUSIVA DE PANTALLA
         function confirmarLimpiezaPantalla() {
             abrirConfirmacion(
                 '¿Limpiar Registros de Pantalla?',
-                'Esto despejará tu panel actual para un nuevo ciclo de facturación. Tu copia de seguridad seguirá intacta en el botón "Cargar Datos".',
+                'Despejará tu panel actual para un nuevo ciclo. Tu copia de seguridad seguirá intacta en "Cargar Datos".',
                 'bg-amber-500 hover:bg-amber-600',
                 'alert-triangle',
                 function() {
@@ -1019,11 +911,10 @@ body {
             );
         }
 
-        // RESET DE FÁBRICA COMPLETO
         function confirmarReseteo() {
             abrirConfirmacion(
                 '¿Reiniciar de fábrica?',
-                'Esto eliminará permanentemente todos tus datos en pantalla, configuraciones y la copia de seguridad guardada de la memoria local.',
+                'Esto eliminará permanentemente todos tus datos en pantalla, configuraciones y la copia de seguridad de la memoria.',
                 'bg-rose-500 hover:bg-rose-600',
                 'alert-octagon',
                 function() {
@@ -1037,7 +928,6 @@ body {
             );
         }
 
-        // CÁLCULO TARIFARIO EXACTO
         function calcularFactura(totalKwh, edeKey) {
             const tarifas = tarifasEde[edeKey];
             const cargoFijo = tarifas.cargoFijo;
@@ -1051,7 +941,6 @@ body {
             } else {
                 let kwhRestante = totalKwh;
                 
-                // Rango 1: 0 - 200 kWh
                 const b1 = Math.min(kwhRestante, 200);
                 if (b1 > 0) {
                     const subtotal = b1 * tarifas.rango1;
@@ -1060,7 +949,6 @@ body {
                     kwhRestante -= b1;
                 }
                 
-                // Rango 2: 201 - 300 kWh
                 const b2 = Math.min(kwhRestante, 100);
                 if (b2 > 0) {
                     const subtotal = b2 * tarifas.rango2;
@@ -1069,7 +957,6 @@ body {
                     kwhRestante -= b2;
                 }
                 
-                // Rango 3: 301 - 700 kWh
                 const b3 = Math.min(kwhRestante, 400);
                 if (b3 > 0) {
                     const subtotal = b3 * tarifas.rango3;
@@ -1080,7 +967,6 @@ body {
             return { costoTotal, cargoFijo, desglose, excedeLimite: totalKwh > 700 };
         }
 
-        // CALCULADORA MANUAL DESDE LA SEGUNDA PESTAÑA
         function ejecutarCalculadoraManual() {
             const val = parseFloat(document.getElementById('calc-input-kwh').value);
             if (isNaN(val) || val <= 0) {
@@ -1107,27 +993,27 @@ body {
             contenedor.innerHTML = html;
         }
 
-        // DETERMINACIÓN DE CICLO SEGÚN DÍA 4
-        function determinarCicloDeLectura(lista) {
-            if (lista.length === 0) return "Del 04/06 al 03/07";
-            const pr = new Date(lista[0].fecha + "T00:00:00");
-            const dia = pr.getDate(), mes = pr.getMonth(), anio = pr.getFullYear();
-            let inicio = dia >= 4 ? new Date(anio, mes, 4) : new Date(anio, mes - 1, 4);
-            let fin = dia >= 4 ? new Date(anio, mes + 1, 3) : new Date(anio, mes, 3);
+        function determinarCicloDeLectura() {
+            const hoy = new Date();
+            let inicio, fin;
+            if (hoy.getDate() >= 4) {
+                inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 4);
+                fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 3);
+            } else {
+                inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 4);
+                fin = new Date(hoy.getFullYear(), hoy.getMonth(), 3);
+            }
             const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
             return `Del ${fmt(inicio)} al ${fmt(fin)}`;
         }
 
-        // RENDERIZADO GLOBAL DE LA INTERFAZ
         function renderizarApp() {
-            // Sincronizar distribuidoras
             document.querySelectorAll('[id^="ede-"]').forEach(btn => {
                 btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white/80 hover:bg-white/10 active:scale-95";
             });
             const activeBtn = document.getElementById(`ede-${edeSeleccionada}`);
             if (activeBtn) activeBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-md font-extrabold scale-100";
 
-            // Sincronizar copias en el Badge inferior
             const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
             document.getElementById('badge-guardados').innerText = backupActual.length;
 
@@ -1139,7 +1025,6 @@ body {
 
             document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
 
-            // Progreso gráfico
             document.getElementById('progreso-texto').innerText = `${totalKwh.toFixed(1)} / 700 kWh`;
             const bV = document.getElementById('progreso-barra-verde'), bA = document.getElementById('progreso-barra-amarilla'), bR = document.getElementById('progreso-barra-roja');
             bV.style.width = bA.style.width = bR.style.width = '0%';
@@ -1155,22 +1040,17 @@ body {
                 bR.style.width = `${(Math.min(totalKwh - 300, 400) / 700) * 100}%`;
             }
 
-            document.getElementById('rango-ciclo').innerText = determinarCicloDeLectura(lecturas);
+            document.getElementById('rango-ciclo').innerText = determinarCicloDeLectura();
 
-            // Filtrado gráfico
             const filtro = document.getElementById('filtro-lecturas').value;
             let paraGrafica = [...lecturas];
             if (filtro === 'con-datos') paraGrafica = paraGrafica.filter(l => !l.esFallo);
 
-            // Estadísticas (Cálculo de Promedio, Proyección, Máximo y Mínimo)
             const validos = lecturas.filter(l => !l.esFallo && l.kwh > 0);
             const errores = lecturas.filter(l => l.esFallo);
             const prom = validos.length > 0 ? (lecturas.reduce((acc, c) => acc + c.kwh, 0) / validos.length) : 0;
             
-            let maxKwh = 0;
-            let maxFecha = "--/--";
-            let minKwh = 0;
-            let minFecha = "--/--";
+            let maxKwh = 0, maxFecha = "--/--", minKwh = 0, minFecha = "--/--";
             
             if (validos.length > 0) {
                 const regMax = validos.reduce((max, op) => op.kwh > max.kwh ? op : max, { kwh: -Infinity });
@@ -1198,7 +1078,6 @@ body {
             document.getElementById('stat-dias-activos').innerText = validos.length;
             document.getElementById('stat-dias-errores').innerText = errores.length;
 
-            // Tabla visual
             const tbody = document.getElementById('tabla-registros');
             tbody.innerHTML = '';
             document.getElementById('tabla-vacia').className = lecturas.length === 0 ? "text-center py-8 text-slate-400 text-xs" : "hidden";
@@ -1222,7 +1101,6 @@ body {
                 tbody.appendChild(tr);
             });
 
-            // RE-DIBUJAR GRÁFICA DIARIA PREMIUM (IGUAL A LA IMAGEN 1000525024.jpg)
             const cG = document.getElementById('grafica-contenedor');
             cG.innerHTML = '';
 
@@ -1232,7 +1110,6 @@ body {
                 paraGrafica.forEach(l => {
                     const p = l.fecha.split('-');
                     const formattedDate = `${p[2]}/${p[1]}`;
-                    
                     const col = document.createElement('div');
                     col.className = "flex flex-col items-center gap-2 min-w-[45px] cursor-pointer group";
                     
@@ -1259,25 +1136,19 @@ body {
                     cG.appendChild(col);
                 });
             } else {
-                cG.innerHTML = `
-                    <div class="w-full text-center py-10 text-slate-400 text-xs font-semibold">
-                        No hay lecturas registradas para graficar.
-                    </div>
-                `;
+                cG.innerHTML = `<div class="w-full text-center py-10 text-slate-400 text-xs font-semibold">No hay lecturas registradas para graficar.</div>`;
             }
 
-            // Actualizar la vista de las tarifas del mes guardadas por si hubo cambios
             renderizarSeccionGuardados();
             lucide.createIcons();
         }
 
-        // TOAST / MENSAJE FLOTANTE EN PANTALLA
         function mostrarAlertaRapida(msg) {
             const viejos = document.querySelectorAll('.app-toast');
             viejos.forEach(v => v.remove());
 
             const div = document.createElement('div');
-            div.className = "app-toast fixed bottom-20 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-xs px-4 py-2.5 rounded-full shadow-2xl z-50 transition-all duration-300 opacity-0 transform translate-y-2 font-medium flex items-center gap-2 border border-slate-700/50";
+            div.className = "app-toast fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-xs px-4 py-2.5 rounded-full shadow-2xl z-50 transition-all duration-300 opacity-0 transform translate-y-2 font-medium flex items-center gap-2 border border-slate-700/50";
             div.innerHTML = `<span class="w-1.5 h-1.5 bg-sky-400 rounded-full animate-ping"></span> ${msg}`;
             document.body.appendChild(div);
             
@@ -1292,29 +1163,25 @@ body {
                 setTimeout(() => div.remove(), 300);
             }, 2300);
         }
-    // --- NUEVA FUNCIÓN DE FACTURACIÓN ---
- function actualizarContadorFacturacion() {
-    const hoy = new Date();
-    const diaCorte = 3;
-    let proximoCorte = new Date(hoy.getFullYear(), hoy.getMonth(), diaCorte);
 
-    // Si hoy ya pasó el día 3, el próximo corte es el mes siguiente
-    if (hoy.getDate() >= diaCorte) {
-        proximoCorte.setMonth(proximoCorte.getMonth() + 1);
-    }
+        function actualizarContadorFacturacion() {
+            const hoy = new Date();
+            const diaCorte = 3;
+            let proximoCorte = new Date(hoy.getFullYear(), hoy.getMonth(), diaCorte);
 
-    const diferenciaTiempo = proximoCorte - hoy;
-    const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
-    
-    const elemento = document.getElementById('contador-facturacion');
-    if (elemento) {
-        elemento.innerText = diasRestantes === 0 ? "¡Corte hoy!" : `${diasRestantes} días para el corte`;
-    }
-}
+            if (hoy.getDate() >= diaCorte) {
+                proximoCorte.setMonth(proximoCorte.getMonth() + 1);
+            }
 
+            const diferenciaTiempo = proximoCorte - hoy;
+            const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
+            
+            const elemento = document.getElementById('contador-facturacion');
+            if (elemento) {
+                elemento.innerText = diasRestantes === 0 ? "¡Corte de Facturación Hoy!" : `Faltan ${diasRestantes} días para el corte`;
+            }
+        }
     </script>
 </body>
 </html>
-
-
 
