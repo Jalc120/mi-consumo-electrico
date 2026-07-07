@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>Consumo Diario Telemedido - EDEs</title>
     
-    <!-- Soporte para Web App Movil (PWA/Home Screen) -->
+    <!-- Soporte para Web App Móvil (PWA/Home Screen) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="Consumo RD">
@@ -33,10 +33,11 @@
 </head>
 <body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
 
-    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60">
+    <!-- CONTENEDOR PRINCIPAL ABSOLUTO (CHASIS MÓVIL) -->
+    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60 shadow-xl rounded-none sm:rounded-[2.5rem]">
 
         <!-- HEADER -->
-        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative">
+        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative z-10">
             <div class="flex justify-between items-center mb-3">
                 <button class="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all" onclick="confirmarReseteo()" title="Resetear de fábrica">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -60,8 +61,8 @@
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL -->
-        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-24">
+        <!-- CONTENIDO PRINCIPAL SCROLLABLE (CON PADDING ADICIONAL PARA EL FOOTER ABSOLUTO) -->
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-32">
             
             <!-- VISTA: CONSUMO (PRINCIPAL) -->
             <div id="view-consumo" class="tab-view space-y-5">
@@ -237,7 +238,7 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE LECTURAS -->
+                <!-- TABLA DE LECTURAS (MEJORADA CON MAYOR ALTURA Y SCROLL SUAVE) -->
                 <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo Actual</h3>
@@ -246,9 +247,9 @@
                         </button>
                     </div>
 
-                    <div class="max-h-60 overflow-y-auto custom-scrollbar">
+                    <div class="max-h-[380px] overflow-y-auto custom-scrollbar pr-1" style="-webkit-overflow-scrolling: touch;">
                         <table class="w-full text-left text-xs text-slate-600">
-                            <thead class="sticky top-0 bg-white shadow-xs">
+                            <thead class="sticky top-0 bg-white shadow-xs z-10">
                                 <tr class="bg-slate-50 text-slate-500 font-semibold border-b border-slate-200">
                                     <th class="py-2.5 px-3 rounded-l-lg">Fecha</th>
                                     <th class="py-2.5 px-3 text-right">Consumo</th>
@@ -358,8 +359,8 @@
 
         </main>
 
-        <!-- BARRA INFERIOR (4 OPCIONES) -->
-        <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+        <!-- BARRA INFERIOR DE NAVEGACIÓN (CAMBIADO A ABSOLUTO PARA MANTENERSE SIEMPRE DENTRO DEL CONTENEDOR) -->
+        <footer class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
             <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16">
                 <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
                 <span>Consumo</span>
@@ -425,6 +426,7 @@
             const savedBackup = localStorage.getItem('copia_seguridad_historial');
             const savedCalculos = localStorage.getItem('calculos_guardados_v4');
             
+            // Inicializar cálculos guardados
             if (!savedCalculos) {
                 const calculosIniciales = [
                     {
@@ -447,7 +449,13 @@
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
-            if (!savedBackup && !savedLecturas) {
+            // CORRECCIÓN CLAVE: Cargar únicamente el estado activo de forma independiente del backup general
+            if (savedLecturas !== null) {
+                lecturas = JSON.parse(savedLecturas);
+            } else if (savedBackup !== null) {
+                lecturas = JSON.parse(savedBackup);
+                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+            } else {
                 const historialBaseInicial = [
                     { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
                     { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
@@ -458,39 +466,24 @@
                 localStorage.setItem('copia_seguridad_historial', JSON.stringify(historialBaseInicial));
                 localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(historialBaseInicial));
                 lecturas = [...historialBaseInicial];
-            } else {
-                const backupActual = savedBackup ? JSON.parse(savedBackup) : [];
-                const activosActual = savedLecturas ? JSON.parse(savedLecturas) : [];
-                
-                const mapaLecturas = {};
-                backupActual.forEach(item => { mapaLecturas[item.fecha] = item; });
-                activosActual.forEach(item => { mapaLecturas[item.fecha] = item; });
-                
-                lecturas = Object.values(mapaLecturas);
-                lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-                
-                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-                localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
             }
 
             if (savedEde) edeSeleccionada = savedEde;
             
             renderizarApp();
             
-            // Ejecutar el limpiador automático cada vez que se carga la página
+            // Ejecutar el limpiador automático si aplica para el fin de ciclo (Día 6 o superior)
             setTimeout(verificarCierreCiclo, 800);
         };
 
-        // ====== NUEVO: LIMPIADOR Y GUARDADO AUTOMÁTICO (DÍA 6) ======
+        // ====== LIMPIADOR Y GUARDADO AUTOMÁTICO (DÍA 6) ======
         function verificarCierreCiclo() {
             const hoy = new Date();
             const diaActual = hoy.getDate();
             const mesActual = hoy.getMonth(); 
             const anioActual = hoy.getFullYear();
 
-            // Ejecuta sólo si estamos en el día 6 o posterior del mes
             if (diaActual >= 6) {
-                // Definimos el ciclo que acaba de pasar (4 del mes pasado al 3 del mes actual)
                 let anioInicio = anioActual;
                 let mesInicio = mesActual - 1;
                 
@@ -502,11 +495,9 @@
                 const fechaFinCiclo = new Date(anioActual, mesActual, 3, 23, 59, 59);
                 const claveCiclo = `04/${String(mesInicio + 1).padStart(2, '0')}/${anioInicio} - 03/${String(mesActual + 1).padStart(2, '0')}/${anioActual}`;
 
-                // Verifica si este ciclo ya fue archivado
                 const yaGuardado = calculosGuardados.some(c => c.fecha === claveCiclo);
 
                 if (!yaGuardado && lecturas.length > 0) {
-                    // Obtener todas las lecturas registradas hasta el día 3
                     const lecturasCicloAnterior = lecturas.filter(l => {
                         const partes = l.fecha.split('-');
                         const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
@@ -537,13 +528,11 @@
                                 }))
                             };
 
-                            // Guardar en Tarifas > Cálculos guardados
                             calculosGuardados.unshift(nuevoRegistroMes);
                             localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
                             localStorage.setItem('lectura_base_v4', actual.toString());
 
-                            // LIMPIEZA AUTOMÁTICA DE LA PANTALLA
-                            // Mantenemos SOLO las lecturas que sean del día 4 en adelante del mes actual
+                            // LIMPIEZA AUTOMÁTICA DEL PANEL
                             lecturas = lecturas.filter(l => {
                                 const partes = l.fecha.split('-');
                                 const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
@@ -554,13 +543,12 @@
 
                             abrirConfirmacion(
                                 '¡Ciclo Auto-Guardado y Limpiado!',
-                                `Se ha detectado tu periodo de facturación (Día 6). El consumo de ${totalKwh.toFixed(1)} kWh del ciclo pasado se archivó en 'Cálculos Guardados' y la pantalla ha sido limpiada automáticamente para iniciar tu nuevo ciclo.`,
+                                `Se ha detectado tu periodo de facturación. El consumo de ${totalKwh.toFixed(1)} kWh del ciclo pasado se archivó en 'Cálculos Guardados' y la pantalla ha sido limpiada automáticamente para iniciar tu nuevo ciclo.`,
                                 'bg-emerald-500 hover:bg-emerald-600',
                                 'check-circle-2',
                                 function() { renderizarApp(); }
                             );
                             
-                            // Aseguramos que cambie el icono a verde para el mensaje de éxito
                             document.getElementById('confirm-icon-wrapper').className = "mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2";
                             document.getElementById('confirm-icon').setAttribute('data-lucide', 'check-circle-2');
                             lucide.createIcons();
@@ -569,7 +557,6 @@
                 }
             }
         }
-        // ====================================================
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
@@ -676,7 +663,7 @@
                 const card = document.createElement('div');
                 card.id = `card-guardado-${item.id}`;
                 card.onclick = () => { if (modoSeleccionMultiple) toggleSeleccionarTarjeta(item.id); };
-                card.className = `bg-white rounded-3xl p-5 border shadow-xs transition-all duration-200 relative ${isSelectedStyle}`;
+                card.className = `bg-white rounded-3xl p-5 border shadow-xs transition-all duration-200 relative cursor-pointer ${isSelectedStyle}`;
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
@@ -904,7 +891,7 @@
                 'alert-triangle',
                 function() {
                     lecturas = [];
-                    localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                    localStorage.setItem('lecturas_ciclo_actual', JSON.stringify([]));
                     renderizarApp();
                     mostrarAlertaRapida('Pantalla limpia. Respaldo a salvo.');
                 }
