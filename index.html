@@ -33,11 +33,11 @@
 </head>
 <body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
 
-    <!-- CONTENEDOR PRINCIPAL ABSOLUTO (CHASIS MÓVIL) -->
-    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60 shadow-xl rounded-none sm:rounded-[2.5rem]">
+    <!-- CONTENEDOR PRINCIPAL AUTÓNOMO (DISEÑO FLEX VERTICAL COMPLETO) -->
+    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col border border-slate-200/60 shadow-xl rounded-none sm:rounded-[2.5rem] relative">
 
         <!-- HEADER -->
-        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative z-10">
+        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative shrink-0">
             <div class="flex justify-between items-center mb-3">
                 <button class="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all" onclick="confirmarReseteo()" title="Resetear de fábrica">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
@@ -61,8 +61,8 @@
             </div>
         </header>
 
-        <!-- CONTENIDO PRINCIPAL SCROLLABLE (CON PADDING ADICIONAL PARA EL FOOTER ABSOLUTO) -->
-        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-32">
+        <!-- CONTENIDO PRINCIPAL SCROLLABLE (CRECE PARA OCUPAR EL ESPACIO RESTANTE) -->
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-6">
             
             <!-- VISTA: CONSUMO (PRINCIPAL) -->
             <div id="view-consumo" class="tab-view space-y-5">
@@ -238,7 +238,7 @@
                     </div>
                 </div>
 
-                <!-- TABLA DE LECTURAS (MEJORADA CON MAYOR ALTURA Y SCROLL SUAVE) -->
+                <!-- TABLA DE LECTURAS -->
                 <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo Actual</h3>
@@ -359,23 +359,23 @@
 
         </main>
 
-        <!-- BARRA INFERIOR DE NAVEGACIÓN (CAMBIADO A ABSOLUTO PARA MANTENERSE SIEMPRE DENTRO DEL CONTENEDOR) -->
-        <footer class="absolute bottom-0 left-0 right-0 bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+        <!-- BARRA INFERIOR DE NAVEGACIÓN (INTEGRADA AL FLUJO COMO PIE ESTABLE DE ALTURA FIJA) -->
+        <footer class="shrink-0 bg-white border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-40 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
             <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16">
                 <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                <span>Consumo</span>
+                <span class="text-[10px] sm:text-xs">Consumo</span>
             </button>
             <button id="tab-btn-calculadora" onclick="switchTab('calculadora')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
                 <i data-lucide="calculator" class="w-6 h-6"></i>
-                <span>Calculadora</span>
+                <span class="text-[10px] sm:text-xs">Calculadora</span>
             </button>
             <button id="tab-btn-tarifa" onclick="switchTab('tarifa')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16">
                 <i data-lucide="receipt" class="w-6 h-6"></i>
-                <span>Tarifa</span>
+                <span class="text-[10px] sm:text-xs">Tarifa</span>
             </button>
             <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative">
                 <i data-lucide="database" class="w-6 h-6"></i>
-                <span>Cargar</span>
+                <span class="text-[10px] sm:text-xs">Cargar</span>
                 <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
             </button>
         </footer>
@@ -449,7 +449,7 @@
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
-            // CORRECCIÓN CLAVE: Cargar únicamente el estado activo de forma independiente del backup general
+            // Cargar únicamente el estado activo de forma independiente
             if (savedLecturas !== null) {
                 lecturas = JSON.parse(savedLecturas);
             } else if (savedBackup !== null) {
@@ -1171,5 +1171,4 @@
     </script>
 </body>
 </html>
-
 
