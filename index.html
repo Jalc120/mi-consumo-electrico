@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Consumo Diario Telemedido - EDEs</title>
     
     <!-- Soporte para Web App Móvil (PWA/Home Screen) -->
@@ -21,20 +21,19 @@
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #f1f5f9;
-            padding-bottom: env(safe-area-inset-bottom);
         }
         .custom-scrollbar::-webkit-scrollbar { height: 6px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .bar-transition { transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
-        .pb-safe { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
     </style>
 </head>
-<body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
+<!-- Usamos h-[100dvh] para que la altura respete dinámicamente las barras nativas del Samsung -->
+<body class="h-[100dvh] overflow-hidden flex justify-center items-center bg-slate-100">
 
     <!-- CONTENEDOR PRINCIPAL AUTÓNOMO (DISEÑO FLEX VERTICAL COMPLETO) -->
-    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col border border-slate-200/60 shadow-xl rounded-none sm:rounded-[2.5rem] relative">
+    <div class="w-full max-w-md h-[100dvh] sm:h-[850px] bg-white overflow-hidden flex flex-col border border-slate-200/60 shadow-xl rounded-none sm:rounded-[2.5rem] relative">
 
         <!-- HEADER -->
         <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative shrink-0">
@@ -359,8 +358,8 @@
 
         </main>
 
-        <!-- BARRA INFERIOR DE NAVEGACIÓN (INTEGRADA AL FLUJO COMO PIE ESTABLE DE ALTURA FIJA) -->
-        <footer class="shrink-0 bg-white border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-40 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+        <!-- BARRA INFERIOR CON PADDING ADICIONAL (ELEVADA PARA EL GALAXY S24 ULTRA) -->
+        <footer class="shrink-0 bg-white border-t border-slate-200 pt-3 pb-10 sm:pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-40 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]" style="padding-bottom: max(2rem, env(safe-area-inset-bottom));">
             <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16">
                 <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
                 <span class="text-[10px] sm:text-xs">Consumo</span>
@@ -426,7 +425,6 @@
             const savedBackup = localStorage.getItem('copia_seguridad_historial');
             const savedCalculos = localStorage.getItem('calculos_guardados_v4');
             
-            // Inicializar cálculos guardados
             if (!savedCalculos) {
                 const calculosIniciales = [
                     {
@@ -449,7 +447,6 @@
                 calculosGuardados = JSON.parse(savedCalculos);
             }
 
-            // Cargar únicamente el estado activo de forma independiente
             if (savedLecturas !== null) {
                 lecturas = JSON.parse(savedLecturas);
             } else if (savedBackup !== null) {
@@ -471,12 +468,9 @@
             if (savedEde) edeSeleccionada = savedEde;
             
             renderizarApp();
-            
-            // Ejecutar el limpiador automático si aplica para el fin de ciclo (Día 6 o superior)
             setTimeout(verificarCierreCiclo, 800);
         };
 
-        // ====== LIMPIADOR Y GUARDADO AUTOMÁTICO (DÍA 6) ======
         function verificarCierreCiclo() {
             const hoy = new Date();
             const diaActual = hoy.getDate();
@@ -532,7 +526,6 @@
                             localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
                             localStorage.setItem('lectura_base_v4', actual.toString());
 
-                            // LIMPIEZA AUTOMÁTICA DEL PANEL
                             lecturas = lecturas.filter(l => {
                                 const partes = l.fecha.split('-');
                                 const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
@@ -1171,4 +1164,6 @@
     </script>
 </body>
 </html>
+
+
 
