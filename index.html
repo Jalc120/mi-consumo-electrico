@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>Consumo Diario Telemedido - EDEs</title>
+    <title>Consumo Diario Telemedido - EDEs (Cloud Pro)</title>
     
     <!-- Soporte para Web App Movil (PWA/Home Screen) -->
     <meta name="apple-mobile-web-app-capable" content="yes">
@@ -29,24 +29,29 @@
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
         .bar-transition { transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1); }
         .pb-safe { padding-bottom: calc(0.75rem + env(safe-area-inset-bottom)); }
+        
+        /* Loader de Nube */
+        .loader-cloud { border: 3px solid #f3f3f3; border-top: 3px solid #0ea5e9; border-radius: 50%; width: 16px; height: 16px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body class="h-screen overflow-hidden flex justify-center items-center bg-slate-100">
 
-    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60">
+    <div class="w-full max-w-md h-full sm:h-[850px] bg-white overflow-hidden flex flex-col relative border border-slate-200/60 shadow-2xl sm:rounded-3xl">
 
         <!-- HEADER -->
-        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative">
+        <header class="bg-gradient-to-r from-cyan-600 to-sky-600 text-white px-5 pt-6 pb-5 rounded-b-[2rem] shadow-lg relative z-10">
             <div class="flex justify-between items-center mb-3">
                 <button class="p-2 hover:bg-white/10 active:scale-95 rounded-full transition-all" onclick="confirmarReseteo()" title="Resetear de fábrica">
                     <i data-lucide="refresh-cw" class="w-5 h-5"></i>
                 </button>
                 <h1 class="text-lg font-bold tracking-tight flex items-center gap-1.5">
                     <i data-lucide="zap" class="w-5 h-5 text-amber-300 fill-amber-300"></i>
-                    Consumo Telemedido RD                   
+                    Consumo Telemedido                  
                 </h1>
-                <div class="bg-white/20 text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span> Memoria Activa
+                <div id="status-nube" class="bg-white/20 text-[10px] sm:text-xs px-2.5 py-1 rounded-full font-semibold flex items-center gap-1.5 transition-all">
+                    <div class="loader-cloud" id="loader-icon"></div>
+                    <span id="status-texto">Conectando...</span>
                 </div>
             </div>
 
@@ -60,8 +65,14 @@
             </div>
         </header>
 
+        <!-- PANTALLA DE CARGA INICIAL -->
+        <div id="pantalla-carga" class="absolute inset-0 bg-white z-40 flex flex-col items-center justify-center space-y-4">
+            <div class="w-16 h-16 border-4 border-sky-100 border-t-sky-500 rounded-full animate-spin"></div>
+            <p class="text-sky-600 font-bold text-sm">Sincronizando Base de Datos...</p>
+        </div>
+
         <!-- CONTENIDO PRINCIPAL -->
-        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-24">
+        <main class="flex-1 overflow-y-auto px-5 py-4 space-y-5 custom-scrollbar pb-24 relative">
             
             <!-- VISTA: CONSUMO (PRINCIPAL) -->
             <div id="view-consumo" class="tab-view space-y-5">
@@ -81,18 +92,18 @@
                     <div class="absolute -right-8 -bottom-8 text-white/5 pointer-events-none">
                         <i data-lucide="zap" class="w-32 h-32"></i>
                     </div>
-                    <div class="flex justify-between items-start mb-4">
+                    <div class="flex justify-between items-start mb-4 relative z-10">
                         <div>
                             <p class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">Ciclo de Facturación Actual</p>
                             <h4 class="text-sm font-semibold text-sky-400 mt-0.5 mb-2" id="rango-ciclo">Detectando ciclo...</h4>
-                            <div id="contador-facturacion" class="bg-blue-100 text-blue-800 text-xs font-bold px-3 py-1 rounded-full inline-block">
+                            <div id="contador-facturacion" class="bg-blue-500/20 text-blue-300 text-[11px] font-bold px-3 py-1 rounded-full inline-block border border-blue-500/30">
                                 Cargando días...
                             </div>
                         </div>
                         <span class="text-[10px] font-mono text-slate-400 bg-slate-800/80 px-2.5 py-1 rounded-md">Serial: 76601965</span>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-2 gap-4 relative z-10">
                         <div class="border-r border-slate-700/60 pr-2">
                             <p class="text-xs text-slate-400">Consumo Acumulado</p>
                             <div class="flex items-baseline gap-1 mt-1">
@@ -109,7 +120,7 @@
                     </div>
 
                     <!-- Progreso -->
-                    <div class="mt-4 pt-4 border-t border-slate-700/60">
+                    <div class="mt-4 pt-4 border-t border-slate-700/60 relative z-10">
                         <div class="flex justify-between text-xs mb-1.5">
                             <span class="text-slate-400">Progreso a Monobloque (&gt;700 kWh)</span>
                             <span class="font-bold text-slate-300" id="progreso-texto">0 / 700 kWh</span>
@@ -153,7 +164,7 @@
                         <div class="bg-indigo-50 text-indigo-600 p-2 rounded-xl">
                             <i data-lucide="trending-up" class="w-5 h-5"></i>
                         </div>
-                        <h3 class="text-base font-bold text-slate-800">Talonario de Estadísticas del Mes</h3>
+                        <h3 class="text-base font-bold text-slate-800">Estadísticas del Mes</h3>
                     </div>
 
                     <div class="grid grid-cols-2 gap-4">
@@ -241,7 +252,7 @@
                 <div class="bg-white rounded-2xl p-4 border border-slate-150 shadow-sm">
                     <div class="flex justify-between items-center mb-3">
                         <h3 class="text-sm font-bold text-slate-800">Historial del Ciclo Actual</h3>
-                        <button onclick="confirmarLimpiezaPantalla()" class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 font-semibold transition-colors" title="Limpia la pantalla pero conserva tu copia en 'Cargar Datos'">
+                        <button onclick="confirmarLimpiezaPantalla()" class="text-xs text-amber-600 hover:text-amber-700 flex items-center gap-1 font-semibold transition-colors" title="Limpia la pantalla pero conserva tu copia en la nube">
                             <i data-lucide="eraser" class="w-3.5 h-3.5"></i> Limpiar Pantalla
                         </button>
                     </div>
@@ -259,7 +270,7 @@
                             <tbody id="tabla-registros" class="divide-y divide-slate-100"></tbody>
                         </table>
                         <div id="tabla-vacia" class="text-center py-8 text-slate-400 text-xs hidden">
-                            No hay lecturas en pantalla. Presiona abajo <strong class="text-slate-500">"Cargar Datos"</strong> para restaurar tu historial seguro.
+                            No hay lecturas en pantalla. Tu base de datos guarda tu historial automáticamente.
                         </div>
                     </div>
                 </div>
@@ -272,7 +283,7 @@
                         <div class="bg-emerald-50 text-emerald-600 p-2 rounded-xl">
                             <i data-lucide="calculator" class="w-5 h-5"></i>
                         </div>
-                        <h3 class="text-base font-bold text-slate-800">Calculadora Tarifaria de Distribuidora</h3>
+                        <h3 class="text-base font-bold text-slate-800">Calculadora Tarifaria</h3>
                     </div>
                     <div class="space-y-3">
                         <div>
@@ -341,16 +352,19 @@
                 <div class="bg-white rounded-3xl p-5 border border-slate-150 shadow-sm space-y-4">
                     <div class="flex items-center gap-2 pb-2 border-b border-slate-100">
                         <div class="bg-sky-50 text-sky-600 p-2 rounded-xl">
-                            <i data-lucide="database" class="text-sky-500"></i> Copia de Seguridad
+                            <i data-lucide="cloud" class="text-sky-500 w-5 h-5"></i>
                         </div>
-                        <h3 class="text-base font-bold text-slate-800">Cargar Datos</h3>
+                        <div>
+                            <h3 class="text-base font-bold text-slate-800">Copia Segura (Nube)</h3>
+                            <p class="text-[10px] text-slate-400">Tus datos están protegidos en Firestore</p>
+                        </div>
                     </div>
                     <div class="space-y-2 pt-2">
                         <button onclick="recuperarHistorialCompleto()" class="w-full bg-emerald-500 text-white py-2.5 rounded-xl text-xs font-bold hover:bg-emerald-600 transition-colors shadow-md shadow-emerald-100 flex items-center justify-center gap-1.5">
-                            <i data-lucide="download-cloud" class="w-4 h-4"></i> Cargar Historial Completo
+                            <i data-lucide="download-cloud" class="w-4 h-4"></i> Descargar Historial Completo
                         </button>
                         <button onclick="restaurarUltimoDatosGuardados()" class="w-full bg-slate-100 text-slate-700 py-2.5 rounded-xl text-xs font-semibold hover:bg-slate-200 transition-colors flex items-center justify-center gap-1.5">
-                            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i> Restaurar último datos guardado
+                            <i data-lucide="history" class="w-4 h-4 text-slate-500"></i> Restaurar Respaldo
                         </button>
                     </div>
                 </div>
@@ -358,8 +372,8 @@
 
         </main>
 
-        <!-- BARRA INFERIOR (4 OPCIONES) -->
-        <footer class="fixed bottom-0 left-0 right-0 max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)]">
+        <!-- BARRA INFERIOR -->
+        <footer class="fixed bottom-0 left-0 right-0 sm:absolute max-w-md mx-auto bg-white/95 backdrop-blur-md border-t border-slate-200 pt-3 pb-6 px-2 flex justify-around items-center text-xs font-semibold text-slate-400 z-50 shadow-[0_-4px_15px_-3px_rgba(0,0,0,0.05)] sm:rounded-b-3xl">
             <button id="tab-btn-consumo" onclick="switchTab('consumo')" class="flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16">
                 <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
                 <span>Consumo</span>
@@ -373,8 +387,8 @@
                 <span>Tarifa</span>
             </button>
             <button id="tab-btn-cargar" onclick="switchTab('cargar')" class="flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative">
-                <i data-lucide="database" class="w-6 h-6"></i>
-                <span>Cargar</span>
+                <i data-lucide="cloud" class="w-6 h-6"></i>
+                <span>Nube</span>
                 <span id="badge-guardados" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-[9px] min-w-[14px] h-[14px] px-0.5 rounded-full flex items-center justify-center font-bold shadow-sm">0</span>
             </button>
         </footer>
@@ -397,7 +411,30 @@
         </div>
     </div>
 
-    <script>
+    <!-- INTEGRACIÓN FIREBASE (Módulo de Base de Datos Profesional) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInWithCustomToken, signInAnonymously, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDocs, collection, deleteDoc } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : {};
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'telemedicion-pro-app';
+
+        // VARIABLES GLOBALES (ESTADO)
+        let userId = null;
+        let edeSeleccionada = 'edenorte';
+        let lecturas = [];
+        let historialBackup = [];
+        let calculosGuardados = [];
+        let lecturaBase = 7891;
+        let callbackConfirmacion = null;
+        let seccionTarifaActiva = 'tarifas';
+        let modoSeleccionMultiple = false;
+        let idsSeleccionados = [];
+
         lucide.createIcons();
 
         const tarifasEde = {
@@ -406,161 +443,234 @@
             edeeste: { nombre: 'EDEESTE', cargoFijo: 126.95, rango1: 5.99, rango2: 8.55, rango3: 13.92, monobloque: 14.10 }
         };
 
-        let edeSeleccionada = 'edenorte';
-        let lecturas = [];
-        let calculosGuardados = [];
-        let callbackConfirmacion = null;
-        let seccionTarifaActiva = 'tarifas';
-        let modoSeleccionMultiple = false;
-        let idsSeleccionados = [];
-
-        window.onload = function() { 
-            actualizarContadorFacturacion();
-            
-            const hoy = new Date();
-            document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
-            
-            const savedLecturas = localStorage.getItem('lecturas_ciclo_actual');
-            const savedEde = localStorage.getItem('ede_seleccionada_v4');
-            const savedBackup = localStorage.getItem('copia_seguridad_historial');
-            const savedCalculos = localStorage.getItem('calculos_guardados_v4');
-            
-            if (!savedCalculos) {
-                const calculosIniciales = [
-                    {
-                        id: 1,
-                        fecha: '04/05/2026 - 03/06/2026',
-                        lecturaAnterior: 7621,
-                        lecturaActual: 7891,
-                        consumo: 270,
-                        costo: 1916.51,
-                        desglose: [
-                            { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 },
-                            { rango: 'Segundo tramo', kwh: 70, tasa: 8.51, total: 595.70 }
-                        ]
-                    }
-                ];
-                localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosIniciales));
-                calculosGuardados = calculosIniciales;
-                localStorage.setItem('lectura_base_v4', '7891');
+        // ====== INICIALIZACIÓN Y CONEXIÓN CON FIREBASE ======
+        async function initApp() {
+            // 1. Autenticación Primero
+            if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                await signInWithCustomToken(auth, __initial_auth_token);
             } else {
-                calculosGuardados = JSON.parse(savedCalculos);
+                await signInAnonymously(auth);
             }
 
-            if (!savedBackup && !savedLecturas) {
-                const historialBaseInicial = [
-                    { fecha: '2026-06-04', kwh: 10.78, esFallo: false },
-                    { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
-                    { fecha: '2026-06-06', kwh: 9.09, esFallo: false },
-                    { fecha: '2026-06-07', kwh: 8.51, esFallo: false },
-                    { fecha: '2026-06-08', kwh: 10.95, esFallo: false }
-                ];
-                localStorage.setItem('copia_seguridad_historial', JSON.stringify(historialBaseInicial));
-                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(historialBaseInicial));
-                lecturas = [...historialBaseInicial];
-            } else {
-                const backupActual = savedBackup ? JSON.parse(savedBackup) : [];
-                const activosActual = savedLecturas ? JSON.parse(savedLecturas) : [];
-                
-                const mapaLecturas = {};
-                backupActual.forEach(item => { mapaLecturas[item.fecha] = item; });
-                activosActual.forEach(item => { mapaLecturas[item.fecha] = item; });
-                
-                lecturas = Object.values(mapaLecturas);
-                lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-                
-                localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-                localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
+            if (auth.currentUser) {
+                userId = auth.currentUser.uid;
             }
 
-            if (savedEde) edeSeleccionada = savedEde;
+            // 2. Extraer datos de la base de datos (Firestore)
+            await cargarDatosDesdeNube();
+
+            // 3. Quitar pantalla de carga y pintar la aplicación
+            document.getElementById('pantalla-carga').classList.add('hidden');
+            
+            const badgeIcon = document.getElementById('loader-icon');
+            badgeIcon.classList.remove('loader-cloud');
+            badgeIcon.innerHTML = `<i data-lucide="cloud-check" class="w-3.5 h-3.5 text-emerald-400"></i>`;
+            document.getElementById('status-texto').innerText = "Nube Conectada";
+            lucide.createIcons();
             
             renderizarApp();
-            
-            // Ejecutar el limpiador automático cada vez que se carga la página
-            setTimeout(verificarCierreCiclo, 800);
-        };
+            actualizarContadorFacturacion();
 
-        // ====== NUEVO: LIMPIADOR Y GUARDADO AUTOMÁTICO (DÍA 6) ======
+            setTimeout(() => {
+                verificarCierreCiclo();
+                mostrarAlertaRapida('Sincronizado con la nube de forma segura ☁️');
+            }, 800);
+        }
+
+        async function cargarDatosDesdeNube() {
+            if (!userId) return;
+
+            // Configuración general
+            const configSnap = await getDocs(collection(db, 'artifacts', appId, 'users', userId, 'config'));
+            configSnap.forEach(doc => {
+                if(doc.id === 'prefs') {
+                    const data = doc.data();
+                    if(data.ede) edeSeleccionada = data.ede;
+                    if(data.lecturaBase) lecturaBase = data.lecturaBase;
+                }
+            });
+
+            // Consumos Activos de Pantalla
+            lecturas = [];
+            const lecturasSnap = await getDocs(collection(db, 'artifacts', appId, 'users', userId, 'lecturas_activas'));
+            lecturasSnap.forEach(doc => lecturas.push(doc.data()));
+            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+            // Historial Profundo (Backup)
+            historialBackup = [];
+            const historialSnap = await getDocs(collection(db, 'artifacts', appId, 'users', userId, 'historial_lecturas'));
+            historialSnap.forEach(doc => historialBackup.push(doc.data()));
+            historialBackup.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+            // Cálculos Guardados de Meses Anteriores
+            calculosGuardados = [];
+            const calculosSnap = await getDocs(collection(db, 'artifacts', appId, 'users', userId, 'calculos_guardados'));
+            calculosSnap.forEach(doc => calculosGuardados.push(doc.data()));
+            calculosGuardados.sort((a, b) => b.id - a.id); // Orden descendente
+
+            // Si todo está vacío (Usuario Nuevo), inyectamos datos base de ejemplo en Firestore
+            if (lecturas.length === 0 && historialBackup.length === 0 && calculosGuardados.length === 0) {
+                await inyectarDatosIniciales();
+            }
+        }
+
+        async function inyectarDatosIniciales() {
+            const ejCalculo = { id: 1, fecha: '04/05/2026 - 03/06/2026', lecturaAnterior: 7621, lecturaActual: 7891, consumo: 270, costo: 1916.51, desglose: [ { rango: 'Primer tramo', kwh: 200, tasa: 5.97, total: 1194.00 }, { rango: 'Segundo tramo', kwh: 70, tasa: 8.51, total: 595.70 } ] };
+            const ejLecturas = [
+                { fecha: '2026-06-04', kwh: 10.78, esFallo: false }, { fecha: '2026-06-05', kwh: 13.21, esFallo: false },
+                { fecha: '2026-06-06', kwh: 9.09, esFallo: false }, { fecha: '2026-06-07', kwh: 8.51, esFallo: false }, { fecha: '2026-06-08', kwh: 10.95, esFallo: false }
+            ];
+
+            calculosGuardados.push(ejCalculo);
+            setDoc(doc(db, 'artifacts', appId, 'users', userId, 'calculos_guardados', ejCalculo.id.toString()), ejCalculo);
+
+            ejLecturas.forEach(l => {
+                lecturas.push(l);
+                historialBackup.push(l);
+                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', l.fecha), l);
+                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'historial_lecturas', l.fecha), l);
+            });
+
+            setDoc(doc(db, 'artifacts', appId, 'users', userId, 'config', 'prefs'), { ede: edeSeleccionada, lecturaBase: 7891 }, {merge:true});
+        }
+
+        // ====== LÓGICA DE NEGOCIO (EXPUESTA A WINDOW PARA EL HTML) ======
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
+            document.getElementById(`view-${tabId}`).classList.remove('hidden');
+            document.querySelectorAll('footer button').forEach(btn => btn.className = "flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative text-slate-400");
+            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16 relative";
+            lucide.createIcons();
+        }
+
+        window.cambiarEde = function(edeKey) {
+            edeSeleccionada = edeKey;
+            renderizarApp();
+            if(userId) setDoc(doc(db, 'artifacts', appId, 'users', userId, 'config', 'prefs'), { ede: edeKey }, { merge: true });
+        }
+
+        window.agregarConsumo = function() {
+            const dateInput = document.getElementById('input-fecha').value;
+            const kwhInput = parseFloat(document.getElementById('input-kwh').value);
+            if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
+                mostrarAlertaRapida('Por favor, ingresa valores válidos.');
+                return;
+            }
+            procesarGuardadoDoble({ fecha: dateInput, kwh: kwhInput, esFallo: false });
+            mostrarAlertaRapida(`Lectura del ${dateInput} subida a la nube ☁️`);
+            document.getElementById('input-kwh').value = '';
+        }
+
+        window.marcarErrorLectura = function() {
+            const dateInput = document.getElementById('input-fecha').value;
+            if (!dateInput) return mostrarAlertaRapida('Selecciona una fecha primero.');
+            procesarGuardadoDoble({ fecha: dateInput, kwh: 0, esFallo: true });
+            mostrarAlertaRapida('Día con error subido a la base de datos.');
+        }
+
+        function procesarGuardadoDoble(nuevaLectura) {
+            // Actualización Local Inmediata (UI a 60fps)
+            const idxActiva = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxActiva !== -1) lecturas[idxActiva] = nuevaLectura;
+            else lecturas.push(nuevaLectura);
+            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+
+            const idxBackup = historialBackup.findIndex(l => l.fecha === nuevaLectura.fecha);
+            if (idxBackup !== -1) historialBackup[idxBackup] = nuevaLectura;
+            else historialBackup.push(nuevaLectura);
+            historialBackup.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
+            
+            renderizarApp();
+            verificarCierreCiclo();
+
+            // Sincronización en segundo plano con Firestore
+            if(userId) {
+                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', nuevaLectura.fecha), nuevaLectura);
+                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'historial_lecturas', nuevaLectura.fecha), nuevaLectura);
+            }
+        }
+
+        window.eliminarRegistro = function(fecha) {
+            lecturas = lecturas.filter(l => l.fecha !== fecha);
+            historialBackup = historialBackup.filter(l => l.fecha !== fecha);
+            renderizarApp();
+            
+            if(userId) {
+                deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', fecha));
+                deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'historial_lecturas', fecha));
+            }
+            mostrarAlertaRapida('Registro eliminado de la base de datos.');
+        }
+
+        window.confirmarLimpiezaPantalla = function() {
+            abrirConfirmacion(
+                '¿Limpiar Registros de Pantalla?',
+                'Despejará tu panel actual para un nuevo ciclo. Tus datos de respaldo seguirán protegidos en Firestore (Nube).',
+                'bg-amber-500 hover:bg-amber-600',
+                'alert-triangle',
+                function() {
+                    const fechasBorradas = lecturas.map(l => l.fecha);
+                    lecturas = [];
+                    renderizarApp();
+                    
+                    if (userId) {
+                        fechasBorradas.forEach(fecha => {
+                            deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', fecha));
+                        });
+                    }
+                    mostrarAlertaRapida('Pantalla limpia. Respaldo a salvo en la nube.');
+                }
+            );
+        }
+
         function verificarCierreCiclo() {
             const hoy = new Date();
-            const diaActual = hoy.getDate();
-            const mesActual = hoy.getMonth(); 
-            const anioActual = hoy.getFullYear();
-
-            // Ejecuta sólo si estamos en el día 6 o posterior del mes
-            if (diaActual >= 6) {
-                // Definimos el ciclo que acaba de pasar (4 del mes pasado al 3 del mes actual)
-                let anioInicio = anioActual;
-                let mesInicio = mesActual - 1;
+            if (hoy.getDate() >= 6) {
+                let anioInicio = hoy.getFullYear(), mesInicio = hoy.getMonth() - 1;
+                if (mesInicio < 0) { mesInicio = 11; anioInicio--; }
                 
-                if (mesInicio < 0) {
-                    mesInicio = 11;
-                    anioInicio--;
-                }
-
-                const fechaFinCiclo = new Date(anioActual, mesActual, 3, 23, 59, 59);
-                const claveCiclo = `04/${String(mesInicio + 1).padStart(2, '0')}/${anioInicio} - 03/${String(mesActual + 1).padStart(2, '0')}/${anioActual}`;
-
-                // Verifica si este ciclo ya fue archivado
+                const fechaFinCiclo = new Date(hoy.getFullYear(), hoy.getMonth(), 3, 23, 59, 59);
+                const claveCiclo = `04/${String(mesInicio + 1).padStart(2, '0')}/${anioInicio} - 03/${String(hoy.getMonth() + 1).padStart(2, '0')}/${hoy.getFullYear()}`;
                 const yaGuardado = calculosGuardados.some(c => c.fecha === claveCiclo);
 
                 if (!yaGuardado && lecturas.length > 0) {
-                    // Obtener todas las lecturas registradas hasta el día 3
-                    const lecturasCicloAnterior = lecturas.filter(l => {
-                        const partes = l.fecha.split('-');
-                        const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
-                        return fechaLectura <= fechaFinCiclo;
-                    });
+                    const lecturasCicloAnterior = lecturas.filter(l => new Date(l.fecha.split('-')[0], l.fecha.split('-')[1] - 1, l.fecha.split('-')[2]) <= fechaFinCiclo);
 
                     if (lecturasCicloAnterior.length > 0) {
                         const totalKwh = lecturasCicloAnterior.reduce((acc, curr) => acc + curr.kwh, 0);
-
                         if (totalKwh > 0) {
-                            const calculoTarifa = calcularFactura(totalKwh, edeSeleccionada);
-                            let lecturaBase = parseFloat(localStorage.getItem('lectura_base_v4') || '7891');
+                            const cal = calcularFactura(totalKwh, edeSeleccionada);
                             const anterior = lecturaBase;
                             const actual = anterior + totalKwh;
 
-                            const nuevoRegistroMes = {
-                                id: Date.now(),
-                                fecha: claveCiclo,
-                                lecturaAnterior: anterior,
-                                lecturaActual: actual,
-                                consumo: totalKwh,
-                                costo: calculoTarifa.costoTotal,
-                                desglose: calculoTarifa.desglose.map(b => ({
-                                    rango: b.rango,
-                                    kwh: b.kwh,
-                                    tasa: b.tasa,
-                                    total: b.total
-                                }))
+                            const nuevoReg = {
+                                id: Date.now(), fecha: claveCiclo, lecturaAnterior: anterior, lecturaActual: actual,
+                                consumo: totalKwh, costo: cal.costoTotal,
+                                desglose: cal.desglose.map(b => ({ rango: b.rango, kwh: b.kwh, tasa: b.tasa, total: b.total }))
                             };
 
-                            // Guardar en Tarifas > Cálculos guardados
-                            calculosGuardados.unshift(nuevoRegistroMes);
-                            localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
-                            localStorage.setItem('lectura_base_v4', actual.toString());
+                            calculosGuardados.unshift(nuevoReg);
+                            lecturaBase = actual;
+                            
+                            // Mantener solo los del nuevo ciclo
+                            const lecturasViejas = lecturas.filter(l => new Date(l.fecha.split('-')[0], l.fecha.split('-')[1] - 1, l.fecha.split('-')[2]) <= fechaFinCiclo);
+                            lecturas = lecturas.filter(l => new Date(l.fecha.split('-')[0], l.fecha.split('-')[1] - 1, l.fecha.split('-')[2]) > fechaFinCiclo);
 
-                            // LIMPIEZA AUTOMÁTICA DE LA PANTALLA
-                            // Mantenemos SOLO las lecturas que sean del día 4 en adelante del mes actual
-                            lecturas = lecturas.filter(l => {
-                                const partes = l.fecha.split('-');
-                                const fechaLectura = new Date(partes[0], partes[1] - 1, partes[2]);
-                                return fechaLectura > fechaFinCiclo;
-                            });
-
-                            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
+                            if(userId) {
+                                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'calculos_guardados', nuevoReg.id.toString()), nuevoReg);
+                                setDoc(doc(db, 'artifacts', appId, 'users', userId, 'config', 'prefs'), { lecturaBase: actual }, {merge:true});
+                                lecturasViejas.forEach(l => {
+                                    deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', l.fecha));
+                                });
+                            }
 
                             abrirConfirmacion(
-                                '¡Ciclo Auto-Guardado y Limpiado!',
-                                `Se ha detectado tu periodo de facturación (Día 6). El consumo de ${totalKwh.toFixed(1)} kWh del ciclo pasado se archivó en 'Cálculos Guardados' y la pantalla ha sido limpiada automáticamente para iniciar tu nuevo ciclo.`,
+                                '¡Ciclo Guardado en la Nube!',
+                                `Es Día 6. El consumo de ${totalKwh.toFixed(1)} kWh del ciclo pasado se sincronizó en 'Cálculos Guardados' y la pantalla ha sido preparada.`,
                                 'bg-emerald-500 hover:bg-emerald-600',
                                 'check-circle-2',
                                 function() { renderizarApp(); }
                             );
-                            
-                            // Aseguramos que cambie el icono a verde para el mensaje de éxito
                             document.getElementById('confirm-icon-wrapper').className = "mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2";
                             document.getElementById('confirm-icon').setAttribute('data-lucide', 'check-circle-2');
                             lucide.createIcons();
@@ -569,47 +679,29 @@
                 }
             }
         }
-        // ====================================================
 
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-view').forEach(view => view.classList.add('hidden'));
-            document.getElementById(`view-${tabId}`).classList.remove('hidden');
-            
-            document.querySelectorAll('footer button').forEach(btn => {
-                btn.className = "flex flex-col items-center gap-1.5 hover:text-slate-600 transition-all active:scale-90 w-16 relative text-slate-400";
-            });
-            document.getElementById(`tab-btn-${tabId}`).className = "flex flex-col items-center gap-1.5 text-sky-600 font-bold transition-all active:scale-90 w-16 relative";
-            lucide.createIcons();
-        }
-
-        function cambiarSeccionTarifa(seccion) {
+        // TARIFA Y CALCULOS GUARDADOS
+        window.cambiarSeccionTarifa = function(seccion) {
             seccionTarifaActiva = seccion;
-            const btnTarifas = document.getElementById('btn-toggle-tarifas');
-            const btnGuardados = document.getElementById('btn-toggle-guardados');
-            const secTarifas = document.getElementById('sec-tarifas-actuales');
-            const secGuardados = document.getElementById('sec-calculos-guardados');
+            const bT = document.getElementById('btn-toggle-tarifas'), bG = document.getElementById('btn-toggle-guardados');
+            const sT = document.getElementById('sec-tarifas-actuales'), sG = document.getElementById('sec-calculos-guardados');
 
             if (seccion === 'tarifas') {
-                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
-                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
-                secTarifas.classList.remove('hidden');
-                secGuardados.classList.add('hidden');
-                modoSeleccionMultiple = false;
-                idsSeleccionados = [];
+                bT.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
+                bG.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
+                sT.classList.remove('hidden'); sG.classList.add('hidden');
+                modoSeleccionMultiple = false; idsSeleccionados = [];
             } else {
-                btnGuardados.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
-                btnTarifas.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
-                secGuardados.classList.remove('hidden');
-                secTarifas.classList.add('hidden');
+                bG.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center bg-white text-sky-800 shadow-sm";
+                bT.className = "py-2.5 text-xs font-bold rounded-xl transition-all text-center text-slate-600 hover:text-slate-800";
+                sG.classList.remove('hidden'); sT.classList.add('hidden');
                 renderizarSeccionGuardados();
             }
             lucide.createIcons();
         }
 
-        function toggleSeleccionMultiple() {
-            modoSeleccionMultiple = !modoSeleccionMultiple;
-            idsSeleccionados = [];
-            
+        window.toggleSeleccionMultiple = function() {
+            modoSeleccionMultiple = !modoSeleccionMultiple; idsSeleccionados = [];
             const btn = document.getElementById('btn-multiple-select');
             if (modoSeleccionMultiple) {
                 btn.className = "w-full bg-rose-500 text-white py-3 rounded-2xl text-xs font-extrabold hover:bg-rose-600 transition-colors shadow-md flex items-center justify-center gap-1.5";
@@ -622,35 +714,33 @@
             lucide.createIcons();
         }
 
-        function toggleSeleccionarTarjeta(id) {
+        window.toggleSeleccionarTarjeta = function(id) {
             if (!modoSeleccionMultiple) return;
-            
-            const index = idsSeleccionados.indexOf(id);
-            if (index > -1) idsSeleccionados.splice(index, 1);
-            else idsSeleccionados.push(id);
-
-            const btn = document.getElementById('btn-multiple-select');
-            btn.innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Seleccionados (${idsSeleccionados.length})`;
-            
-            const cardEl = document.getElementById(`card-guardado-${id}`);
-            if (idsSeleccionados.includes(id)) {
-                cardEl.classList.add('border-sky-500', 'bg-sky-50/20');
-            } else {
-                cardEl.classList.remove('border-sky-500', 'bg-sky-50/20');
-            }
+            const idx = idsSeleccionados.indexOf(id);
+            if (idx > -1) idsSeleccionados.splice(idx, 1); else idsSeleccionados.push(id);
+            document.getElementById('btn-multiple-select').innerHTML = `<i data-lucide="trash-2" class="w-4 h-4"></i> Eliminar Seleccionados (${idsSeleccionados.length})`;
+            renderizarSeccionGuardados();
         }
 
-        function eliminarTarjetaUnica(id) {
-            abrirConfirmacion(
-                '¿Eliminar este cálculo?',
-                'Se borrará de forma permanente de tu historial.',
-                'bg-rose-500 hover:bg-rose-600',
-                'alert-octagon',
+        window.eliminarTarjetaUnica = function(id) {
+            abrirConfirmacion('¿Eliminar este cálculo?', 'Se borrará de forma permanente de tu historial en la nube.', 'bg-rose-500 hover:bg-rose-600', 'alert-octagon',
                 function() {
                     calculosGuardados = calculosGuardados.filter(c => c.id !== id);
-                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
                     renderizarSeccionGuardados();
+                    if(userId) deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'calculos_guardados', id.toString()));
                     mostrarAlertaRapida('Cálculo eliminado.');
+                }
+            );
+        }
+
+        function ejecutarEliminarLote() {
+            if (idsSeleccionados.length === 0) return mostrarAlertaRapida('Selecciona al menos un cálculo.');
+            abrirConfirmacion('¿Eliminar los elementos?', `¿Seguro que deseas eliminar los ${idsSeleccionados.length} cálculos de la nube?`, 'bg-rose-500 hover:bg-rose-600', 'alert-octagon',
+                function() {
+                    calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
+                    if(userId) idsSeleccionados.forEach(id => deleteDoc(doc(db, 'artifacts', appId, 'users', userId, 'calculos_guardados', id.toString())));
+                    window.toggleSeleccionMultiple();
+                    mostrarAlertaRapida('Elementos eliminados de la nube.');
                 }
             );
         }
@@ -658,53 +748,32 @@
         function renderizarSeccionGuardados() {
             const contenedor = document.getElementById('lista-calculos-contenedor');
             contenedor.innerHTML = '';
-
-            if (calculosGuardados.length === 0) {
-                contenedor.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs font-medium">No hay cálculos archivados.</div>`;
-                return;
-            }
+            if (calculosGuardados.length === 0) return contenedor.innerHTML = `<div class="text-center py-10 text-slate-400 text-xs font-medium">No hay cálculos archivados en la nube.</div>`;
 
             calculosGuardados.forEach(item => {
-                const tramosHtml = item.desglose.map(b => {
-                    const desc = b.rango.includes('tramo') || b.rango.includes('Rango') ? b.rango : `Rango (${b.rango})`;
-                    return `<p class="text-[11px] text-[#0284c7] font-medium tracking-tight">${desc}: ${b.kwh.toFixed(0)} kWh x $${b.tasa.toFixed(2)} = $${b.total.toFixed(2)}</p>`;
-                }).join('');
-
-                const isSelected = idsSeleccionados.includes(item.id);
-                const isSelectedStyle = isSelected ? 'border-sky-500 bg-sky-50/20' : 'border-slate-100';
+                const isSel = idsSeleccionados.includes(item.id);
+                const stl = isSel ? 'border-sky-500 bg-sky-50/20' : 'border-slate-100';
+                const tramos = item.desglose.map(b => `<p class="text-[11px] text-[#0284c7] font-medium tracking-tight">${b.rango}: ${b.kwh.toFixed(0)} kWh x $${b.tasa.toFixed(2)} = $${b.total.toFixed(2)}</p>`).join('');
 
                 const card = document.createElement('div');
-                card.id = `card-guardado-${item.id}`;
-                card.onclick = () => { if (modoSeleccionMultiple) toggleSeleccionarTarjeta(item.id); };
-                card.className = `bg-white rounded-3xl p-5 border shadow-xs transition-all duration-200 relative ${isSelectedStyle}`;
+                card.id = `card-guardado-${item.id}`; card.className = `bg-white rounded-3xl p-5 border shadow-xs transition-all relative cursor-pointer ${stl}`;
+                card.onclick = () => window.toggleSeleccionarTarjeta(item.id);
                 
                 card.innerHTML = `
                     <div class="flex justify-between items-center mb-3">
                         <div class="flex items-center gap-2">
-                            ${modoSeleccionMultiple ? `
-                                <div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSelected ? 'border-sky-500 bg-sky-500 text-white' : 'border-slate-300' }">
-                                    ${isSelected ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}
-                                </div>` : ''
-                            }
+                            ${modoSeleccionMultiple ? `<div class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${isSel ? 'border-sky-500 bg-sky-500 text-white' : 'border-slate-300' }">${isSel ? '<i data-lucide="check" class="w-3.5 h-3.5"></i>' : ''}</div>` : ''}
                             <span class="text-[11px] sm:text-xs font-extrabold text-[#0284c7]">Ciclo: ${item.fecha}</span>
                         </div>
                         <div class="flex items-center gap-2.5">
                             <span class="text-sm sm:text-base font-extrabold text-[#10b981]">$${item.costo.toFixed(2)}</span>
-                            ${!modoSeleccionMultiple ? `
-                                <button onclick="event.stopPropagation(); eliminarTarjetaUnica(${item.id})" class="text-rose-500 p-1 hover:bg-rose-50 rounded-lg transition-colors">
-                                    <i data-lucide="trash-2" class="w-4 h-4"></i>
-                                </button>` : ''
-                            }
+                            ${!modoSeleccionMultiple ? `<button onclick="event.stopPropagation(); window.eliminarTarjetaUnica(${item.id})" class="text-rose-500 p-1 hover:bg-rose-50 rounded-lg"><i data-lucide="trash-2" class="w-4 h-4"></i></button>` : ''}
                         </div>
                     </div>
-                    
                     <div class="space-y-1.5 text-slate-600 text-xs">
-                        <p>Lectura anterior: ${item.lecturaAnterior.toFixed(0)} kWh</p>
-                        <p>Lectura actual: ${item.lecturaActual.toFixed(0)} kWh</p>
+                        <p>Lectura anterior: ${item.lecturaAnterior.toFixed(0)} kWh</p><p>Lectura actual: ${item.lecturaActual.toFixed(0)} kWh</p>
                         <p class="font-extrabold text-slate-900 text-[13px] my-1">Consumo: ${item.consumo.toFixed(0)} kWh</p>
-                        <div class="pt-1.5 border-t border-slate-100 space-y-1">
-                            ${tramosHtml}
-                        </div>
+                        <div class="pt-1.5 border-t border-slate-100 space-y-1">${tramos}</div>
                     </div>
                 `;
                 contenedor.appendChild(card);
@@ -712,476 +781,201 @@
             lucide.createIcons();
         }
 
-        function ejecutarEliminarLote() {
-            if (idsSeleccionados.length === 0) {
-                mostrarAlertaRapida('Por favor, selecciona al menos un cálculo.');
-                return;
-            }
-            abrirConfirmacion(
-                '¿Eliminar los elementos?',
-                `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos de forma irreversible?`,
-                'bg-rose-500 hover:bg-rose-600',
-                'alert-octagon',
-                function() {
-                    calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
-                    localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
-                    toggleSeleccionMultiple();
-                    mostrarAlertaRapida('Elementos eliminados.');
-                }
-            );
-        }
-
-        document.getElementById('confirm-btn-proceder').onclick = function() {
-            if (callbackConfirmacion) callbackConfirmacion();
-            cerrarModalConfirmacion();
-        };
-
-        function abrirConfirmacion(titulo, desc, colorBtn, icono, callback) {
-            document.getElementById('confirm-titulo').innerText = titulo;
-            document.getElementById('confirm-descripcion').innerText = desc;
+        // CARGA DESDE LA NUBE
+        window.recuperarHistorialCompleto = function() {
+            if (historialBackup.length === 0) return mostrarAlertaRapida('La nube está vacía.');
+            lecturas = [...historialBackup];
             
-            const btn = document.getElementById('confirm-btn-proceder');
-            
-            if (modoSeleccionMultiple && idsSeleccionados.length > 0 && callbackConfirmacion === ejecutarEliminarLote) {
-                btn.onclick = function() {
-                    ejecutarEliminarLote();
-                    cerrarModalConfirmacion();
-                };
-            } else {
-                btn.onclick = function() {
-                    if (callback) callback();
-                    cerrarModalConfirmacion();
-                };
+            // Re-escribir lecturas activas en DB para que sea consistente
+            if(userId) {
+                historialBackup.forEach(l => setDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', l.fecha), l));
             }
-
-            btn.className = `w-full text-white py-2.5 rounded-xl text-xs font-bold transition-colors ${colorBtn}`;
-            
-            const iconWrap = document.getElementById('confirm-icon-wrapper');
-            if (colorBtn.includes('rose') || colorBtn.includes('red')) {
-                iconWrap.className = "mx-auto w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2";
-                document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-octagon');
-            } else if(colorBtn.includes('emerald') || colorBtn.includes('green')){
-                iconWrap.className = "mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2";
-                document.getElementById('confirm-icon').setAttribute('data-lucide', 'check-circle-2');
-            } else {
-                iconWrap.className = "mx-auto w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2";
-                document.getElementById('confirm-icon').setAttribute('data-lucide', 'alert-triangle');
-            }
-            
-            if(icono) document.getElementById('confirm-icon').setAttribute('data-lucide', icono);
-
-            lucide.createIcons();
-            callbackConfirmacion = callback;
-            document.getElementById('modal-confirmacion').classList.remove('hidden');
-        }
-
-        document.getElementById('btn-multiple-select').onclick = function() {
-            if (modoSeleccionMultiple && idsSeleccionados.length > 0) {
-                abrirConfirmacion(
-                    '¿Eliminar los elementos?',
-                    `¿Estás seguro de eliminar los ${idsSeleccionados.length} cálculos de forma irreversible?`,
-                    'bg-rose-500 hover:bg-rose-600',
-                    'alert-octagon',
-                    function() {
-                        calculosGuardados = calculosGuardados.filter(c => !idsSeleccionados.includes(c.id));
-                        localStorage.setItem('calculos_guardados_v4', JSON.stringify(calculosGuardados));
-                        toggleSeleccionMultiple();
-                        mostrarAlertaRapida('Elementos eliminados correctamente.');
-                    }
-                );
-            } else {
-                toggleSeleccionMultiple();
-            }
-        };
-
-        function cerrarModalConfirmacion() {
-            document.getElementById('modal-confirmacion').classList.add('hidden');
-            callbackConfirmacion = null;
-        }
-
-        function recuperarHistorialCompleto() {
-            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            if (backupActual.length === 0) {
-                mostrarAlertaRapida('No hay datos en tu copia de seguridad.');
-                return;
-            }
-            lecturas = [...backupActual];
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
             renderizarApp();
-            mostrarAlertaRapida('¡Historial completo cargado!');
+            mostrarAlertaRapida('¡Historial completo descargado de la nube! ☁️');
         }
 
-        function restaurarUltimoDatosGuardados() {
-            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            if (backupActual.length === 0) {
-                mostrarAlertaRapida('No hay datos en la copia de seguridad.');
-                return;
-            }
+        window.restaurarUltimoDatosGuardados = function() {
+            if (historialBackup.length === 0) return mostrarAlertaRapida('No hay respaldos en la nube.');
+            const mapa = {};
+            lecturas.forEach(l => mapa[l.fecha] = l);
+            historialBackup.forEach(l => { if (!mapa[l.fecha]) mapa[l.fecha] = l; });
+            lecturas = Object.values(mapa).sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
             
-            const mapaLecturas = {};
-            lecturas.forEach(item => { mapaLecturas[item.fecha] = item; });
-            backupActual.forEach(item => {
-                if (!mapaLecturas[item.fecha]) mapaLecturas[item.fecha] = item;
-            });
-            
-            lecturas = Object.values(mapaLecturas);
-            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(lecturas));
+            if(userId) lecturas.forEach(l => setDoc(doc(db, 'artifacts', appId, 'users', userId, 'lecturas_activas', l.fecha), l));
             
             renderizarApp();
-            mostrarAlertaRapida('¡Últimos datos restaurados!');
+            mostrarAlertaRapida('¡Datos fusionados y restaurados! ☁️');
         }
 
-        function cambiarEde(edeKey) {
-            edeSeleccionada = edeKey;
-            localStorage.setItem('ede_seleccionada_v4', edeKey);
-            renderizarApp();
-        }
-
-        function procesarGuardadoDoble(nuevaLectura) {
-            const idxCiclo = lecturas.findIndex(l => l.fecha === nuevaLectura.fecha);
-            if (idxCiclo !== -1) lecturas[idxCiclo] = nuevaLectura;
-            else lecturas.push(nuevaLectura);
-            lecturas.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-
-            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            const idxBackup = backupTotal.findIndex(l => l.fecha === nuevaLectura.fecha);
-            if (idxBackup !== -1) backupTotal[idxBackup] = nuevaLectura;
-            else backupTotal.push(nuevaLectura);
-            backupTotal.sort((a, b) => new Date(a.fecha) - new Date(b.fecha));
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
-
-            renderizarApp();
-        }
-
-        function agregarConsumo() {
-            const dateInput = document.getElementById('input-fecha').value;
-            const kwhInput = parseFloat(document.getElementById('input-kwh').value);
-
-            if (!dateInput || isNaN(kwhInput) || kwhInput < 0) {
-                mostrarAlertaRapida('Por favor, ingresa valores válidos.');
-                return;
-            }
-
-            const item = { fecha: dateInput, kwh: kwhInput, esFallo: false };
-            procesarGuardadoDoble(item);
-            
-            mostrarAlertaRapida(`Lectura del día ${dateInput} guardada correctamente`);
-            document.getElementById('input-kwh').value = '';
-        }
-
-        function marcarErrorLectura() {
-            const dateInput = document.getElementById('input-fecha').value;
-            if (!dateInput) {
-                mostrarAlertaRapida('Selecciona una fecha primero.');
-                return;
-            }
-
-            const item = { fecha: dateInput, kwh: 0, esFallo: true };
-            procesarGuardadoDoble(item);
-        }
-
-        function eliminarRegistro(fecha) {
-            lecturas = lecturas.filter(l => l.fecha !== fecha);
-            localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-            
-            let backupTotal = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            backupTotal = backupTotal.filter(l => l.fecha !== fecha);
-            localStorage.setItem('copia_seguridad_historial', JSON.stringify(backupTotal));
-
-            renderizarApp();
-            mostrarAlertaRapida('Registro eliminado de la memoria.');
-        }
-
-        function confirmarLimpiezaPantalla() {
-            abrirConfirmacion(
-                '¿Limpiar Registros de Pantalla?',
-                'Despejará tu panel actual para un nuevo ciclo. Tu copia de seguridad seguirá intacta en "Cargar Datos".',
-                'bg-amber-500 hover:bg-amber-600',
-                'alert-triangle',
-                function() {
-                    lecturas = [];
-                    localStorage.setItem('lecturas_ciclo_actual', JSON.stringify(lecturas));
-                    renderizarApp();
-                    mostrarAlertaRapida('Pantalla limpia. Respaldo a salvo.');
-                }
-            );
-        }
-
-        function confirmarReseteo() {
-            abrirConfirmacion(
-                '¿Reiniciar de fábrica?',
-                'Esto eliminará permanentemente todos tus datos en pantalla, configuraciones y la copia de seguridad de la memoria.',
-                'bg-rose-500 hover:bg-rose-600',
-                'alert-octagon',
-                function() {
-                    localStorage.clear();
-                    lecturas = [];
-                    calculosGuardados = [];
-                    edeSeleccionada = 'edenorte';
-                    renderizarApp();
-                    mostrarAlertaRapida('Aplicación totalmente restablecida.');
-                }
-            );
-        }
-
+        // UI Y CALCULOS
         function calcularFactura(totalKwh, edeKey) {
-            const tarifas = tarifasEde[edeKey];
-            const cargoFijo = tarifas.cargoFijo;
-            let desglose = [];
-            let costoTotal = cargoFijo;
-
+            const t = tarifasEde[edeKey];
+            let desglose = [], costo = t.cargoFijo, res = totalKwh;
             if (totalKwh > 700) {
-                const costoMonobloque = totalKwh * tarifas.monobloque;
-                costoTotal = costoMonobloque + cargoFijo;
-                desglose.push({ rango: `Tarifa Plana Monobloque`, kwh: totalKwh, tasa: tarifas.monobloque, total: costoMonobloque });
+                costo += totalKwh * t.monobloque;
+                desglose.push({ rango: `Monobloque`, kwh: totalKwh, tasa: t.monobloque, total: totalKwh * t.monobloque });
             } else {
-                let kwhRestante = totalKwh;
-                
-                const b1 = Math.min(kwhRestante, 200);
-                if (b1 > 0) {
-                    const subtotal = b1 * tarifas.rango1;
-                    costoTotal += subtotal;
-                    desglose.push({ rango: 'Primer tramo', kwh: b1, tasa: tarifas.rango1, total: subtotal });
-                    kwhRestante -= b1;
-                }
-                
-                const b2 = Math.min(kwhRestante, 100);
-                if (b2 > 0) {
-                    const subtotal = b2 * tarifas.rango2;
-                    costoTotal += subtotal;
-                    desglose.push({ rango: 'Segundo tramo', kwh: b2, tasa: tarifas.rango2, total: subtotal });
-                    kwhRestante -= b2;
-                }
-                
-                const b3 = Math.min(kwhRestante, 400);
-                if (b3 > 0) {
-                    const subtotal = b3 * tarifas.rango3;
-                    costoTotal += subtotal;
-                    desglose.push({ rango: 'Tercer tramo', kwh: b3, tasa: tarifas.rango3, total: subtotal });
-                }
+                const b1 = Math.min(res, 200); if (b1>0) { costo+=b1*t.rango1; desglose.push({rango:'Tramo 1',kwh:b1,tasa:t.rango1,total:b1*t.rango1}); res-=b1; }
+                const b2 = Math.min(res, 100); if (b2>0) { costo+=b2*t.rango2; desglose.push({rango:'Tramo 2',kwh:b2,tasa:t.rango2,total:b2*t.rango2}); res-=b2; }
+                const b3 = Math.min(res, 400); if (b3>0) { costo+=b3*t.rango3; desglose.push({rango:'Tramo 3',kwh:b3,tasa:t.rango3,total:b3*t.rango3}); }
             }
-            return { costoTotal, cargoFijo, desglose, excedeLimite: totalKwh > 700 };
+            return { costoTotal: costo, cargoFijo: t.cargoFijo, desglose, excedeLimite: totalKwh > 700 };
         }
 
-        function ejecutarCalculadoraManual() {
-            const val = parseFloat(document.getElementById('calc-input-kwh').value);
-            if (isNaN(val) || val <= 0) {
-                mostrarAlertaRapida('Ingresa una cantidad de kWh válida.');
-                return;
-            }
-
-            const calc = calcularFactura(val, edeSeleccionada);
-            const contenedor = document.getElementById('calc-resultado-contenido');
+        window.ejecutarCalculadoraManual = function() {
+            const v = parseFloat(document.getElementById('calc-input-kwh').value);
+            if (isNaN(v) || v <= 0) return mostrarAlertaRapida('Ingresa un valor válido.');
+            const c = calcularFactura(v, edeSeleccionada);
             document.getElementById('calc-resultado-bloque').classList.remove('hidden');
-
-            let html = `
-                <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 mb-2">
-                    <p class="text-[10px] text-slate-400 font-bold uppercase">Distribuidora</p>
-                    <p class="font-extrabold text-slate-800">${tarifasEde[edeSeleccionada].nombre}</p>
-                </div>
-                <div class="space-y-1.5 border-t border-slate-100 pt-2">
-                    <div class="flex justify-between"><span>Cargo Fijo Obligatorio:</span><strong>RD$ ${calc.cargoFijo.toFixed(2)}</strong></div>
-            `;
-            calc.desglose.forEach(b => { 
-                html += `<div class="flex justify-between border-b border-slate-50 pb-1"><span>${b.rango} (${b.kwh.toFixed(1)} kWh × RD$ ${b.tasa.toFixed(2)}):</span><strong>RD$ ${b.total.toFixed(2)}</strong></div>`; 
-            });
-            html += `</div><div class="bg-emerald-50 text-emerald-800 p-3 rounded-xl font-bold flex justify-between mt-3 text-sm border border-emerald-100"><span>Total Directo Estimado:</span><span>RD$ ${calc.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2 })}</span></div>`;
-            contenedor.innerHTML = html;
+            let h = `<div class="bg-slate-50 p-3 rounded-xl border mb-2"><p class="text-[10px] text-slate-400 font-bold">Distribuidora</p><p class="font-extrabold text-slate-800">${tarifasEde[edeSeleccionada].nombre}</p></div><div class="space-y-1.5 border-t border-slate-100 pt-2"><div class="flex justify-between"><span>Cargo Fijo:</span><strong>RD$ ${c.cargoFijo.toFixed(2)}</strong></div>`;
+            c.desglose.forEach(b => h += `<div class="flex justify-between border-b border-slate-50 pb-1"><span>${b.rango} (${b.kwh.toFixed(1)} kWh × RD$ ${b.tasa.toFixed(2)}):</span><strong>RD$ ${b.total.toFixed(2)}</strong></div>`);
+            h += `</div><div class="bg-emerald-50 text-emerald-800 p-3 rounded-xl font-bold flex justify-between mt-3 text-sm"><span>Total:</span><span>RD$ ${c.costoTotal.toLocaleString('es-DO', {minimumFractionDigits:2})}</span></div>`;
+            document.getElementById('calc-resultado-contenido').innerHTML = h;
         }
 
-        function determinarCicloDeLectura() {
-            const hoy = new Date();
-            let inicio, fin;
-            if (hoy.getDate() >= 4) {
-                inicio = new Date(hoy.getFullYear(), hoy.getMonth(), 4);
-                fin = new Date(hoy.getFullYear(), hoy.getMonth() + 1, 3);
-            } else {
-                inicio = new Date(hoy.getFullYear(), hoy.getMonth() - 1, 4);
-                fin = new Date(hoy.getFullYear(), hoy.getMonth(), 3);
-            }
-            const fmt = (d) => `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-            return `Del ${fmt(inicio)} al ${fmt(fin)}`;
-        }
+        window.renderizarApp = function() {
+            document.querySelectorAll('[id^="ede-"]').forEach(btn => btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white/80 hover:bg-white/10 active:scale-95");
+            if(document.getElementById(`ede-${edeSeleccionada}`)) document.getElementById(`ede-${edeSeleccionada}`).className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-md font-extrabold scale-100";
 
-        function renderizarApp() {
-            document.querySelectorAll('[id^="ede-"]').forEach(btn => {
-                btn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center text-white/80 hover:bg-white/10 active:scale-95";
-            });
-            const activeBtn = document.getElementById(`ede-${edeSeleccionada}`);
-            if (activeBtn) activeBtn.className = "py-2 text-xs font-bold rounded-lg transition-all text-center bg-white text-cyan-700 shadow-md font-extrabold scale-100";
-
-            const backupActual = JSON.parse(localStorage.getItem('copia_seguridad_historial') || '[]');
-            document.getElementById('badge-guardados').innerText = backupActual.length;
-
-            const totalKwh = lecturas.reduce((acc, curr) => acc + curr.kwh, 0);
+            document.getElementById('badge-guardados').innerText = historialBackup.length;
+            const totalKwh = lecturas.reduce((a, c) => a + c.kwh, 0);
             document.getElementById('total-kwh').innerText = totalKwh.toFixed(2);
 
-            const calculo = calcularFactura(totalKwh, edeSeleccionada);
-            document.getElementById('total-pesos').innerText = `RD$ ${calculo.costoTotal.toLocaleString('es-DO', { minimumFractionDigits: 2,maximumFractionDigits: 2 })}`;
-
-            document.getElementById('alerta-exceso').className = calculo.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
+            const cal = calcularFactura(totalKwh, edeSeleccionada);
+            document.getElementById('total-pesos').innerText = `RD$ ${cal.costoTotal.toLocaleString('es-DO', { minimumFractionDigits:2, maximumFractionDigits:2 })}`;
+            document.getElementById('alerta-exceso').className = cal.excedeLimite ? "bg-rose-50 border border-rose-200 rounded-2xl p-4 text-rose-800 flex items-start gap-3 shadow-xs animate-pulse" : "hidden";
 
             document.getElementById('progreso-texto').innerText = `${totalKwh.toFixed(1)} / 700 kWh`;
             const bV = document.getElementById('progreso-barra-verde'), bA = document.getElementById('progreso-barra-amarilla'), bR = document.getElementById('progreso-barra-roja');
             bV.style.width = bA.style.width = bR.style.width = '0%';
-            
-            if (totalKwh <= 200) {
-                bV.style.width = `${(totalKwh / 700) * 100}%`;
-            } else if (totalKwh <= 300) {
-                bV.style.width = `${(200 / 700) * 100}%`;
-                bA.style.width = `${((totalKwh - 200) / 700) * 100}%`;
-            } else {
-                bV.style.width = `${(200 / 700) * 100}%`;
-                bA.style.width = `${(100 / 700) * 100}%`;
-                bR.style.width = `${(Math.min(totalKwh - 300, 400) / 700) * 100}%`;
-            }
+            if (totalKwh <= 200) { bV.style.width = `${(totalKwh/700)*100}%`; } 
+            else if (totalKwh <= 300) { bV.style.width = `${(200/700)*100}%`; bA.style.width = `${((totalKwh-200)/700)*100}%`; } 
+            else { bV.style.width = `${(200/700)*100}%`; bA.style.width = `${(100/700)*100}%`; bR.style.width = `${(Math.min(totalKwh-300, 400)/700)*100}%`; }
 
-            document.getElementById('rango-ciclo').innerText = determinarCicloDeLectura();
+            const hoy = new Date(); let i, f;
+            if(hoy.getDate() >= 4) { i = new Date(hoy.getFullYear(), hoy.getMonth(), 4); f = new Date(hoy.getFullYear(), hoy.getMonth()+1, 3); } 
+            else { i = new Date(hoy.getFullYear(), hoy.getMonth()-1, 4); f = new Date(hoy.getFullYear(), hoy.getMonth(), 3); }
+            const fmt = (d) => `${String(d.getDate()).padStart(2,'0')}/${String(d.getMonth()+1).padStart(2,'0')}`;
+            document.getElementById('rango-ciclo').innerText = `Del ${fmt(i)} al ${fmt(f)}`;
 
             const filtro = document.getElementById('filtro-lecturas').value;
-            let paraGrafica = [...lecturas];
-            if (filtro === 'con-datos') paraGrafica = paraGrafica.filter(l => !l.esFallo);
+            let paraGraf = filtro === 'con-datos' ? lecturas.filter(l => !l.esFallo) : [...lecturas];
 
-            const validos = lecturas.filter(l => !l.esFallo && l.kwh > 0);
-            const errores = lecturas.filter(l => l.esFallo);
-            const prom = validos.length > 0 ? (lecturas.reduce((acc, c) => acc + c.kwh, 0) / validos.length) : 0;
-            
-            let maxKwh = 0, maxFecha = "--/--", minKwh = 0, minFecha = "--/--";
-            
-            if (validos.length > 0) {
-                const regMax = validos.reduce((max, op) => op.kwh > max.kwh ? op : max, { kwh: -Infinity });
-                maxKwh = regMax.kwh;
-                if (regMax.fecha) {
-                    const p = regMax.fecha.split('-');
-                    maxFecha = `${p[2]}/${p[1]}`;
-                }
-                
-                const regMin = validos.reduce((min, op) => op.kwh < min.kwh ? op : min, { kwh: Infinity });
-                minKwh = regMin.kwh;
-                if (regMin.fecha) {
-                    const p = regMin.fecha.split('-');
-                    minFecha = `${p[2]}/${p[1]}`;
-                }
+            const val = lecturas.filter(l => !l.esFallo && l.kwh > 0), err = lecturas.filter(l => l.esFallo);
+            const pro = val.length > 0 ? (lecturas.reduce((a, c) => a + c.kwh, 0) / val.length) : 0;
+            let mx = 0, mxD = "--/--", mn = 0, mnD = "--/--";
+            if (val.length > 0) {
+                const rM = val.reduce((m, o) => o.kwh > m.kwh ? o : m, { kwh: -Infinity }); mx = rM.kwh; if (rM.fecha) mxD = `${rM.fecha.split('-')[2]}/${rM.fecha.split('-')[1]}`;
+                const rm = val.reduce((m, o) => o.kwh < m.kwh ? o : m, { kwh: Infinity }); mn = rm.kwh; if (rm.fecha) mnD = `${rm.fecha.split('-')[2]}/${rm.fecha.split('-')[1]}`;
             }
 
-            document.getElementById('stat-promedio').innerText = prom.toFixed(2);
-            document.getElementById('stat-proyeccion').innerText = (prom * 30).toFixed(2);
-            document.getElementById('stat-maximo').innerText = maxKwh.toFixed(2);
-            document.getElementById('stat-maximo-dia').innerText = `Día: ${maxFecha}`;
-            document.getElementById('stat-minimo').innerText = minKwh.toFixed(2);
-            document.getElementById('stat-minimo-dia').innerText = `Día: ${minFecha}`;
-            
-            document.getElementById('stat-dias-activos').innerText = validos.length;
-            document.getElementById('stat-dias-errores').innerText = errores.length;
+            document.getElementById('stat-promedio').innerText = pro.toFixed(2); document.getElementById('stat-proyeccion').innerText = (pro*30).toFixed(2);
+            document.getElementById('stat-maximo').innerText = mx.toFixed(2); document.getElementById('stat-maximo-dia').innerText = `Día: ${mxD}`;
+            document.getElementById('stat-minimo').innerText = mn.toFixed(2); document.getElementById('stat-minimo-dia').innerText = `Día: ${mnD}`;
+            document.getElementById('stat-dias-activos').innerText = val.length; document.getElementById('stat-dias-errores').innerText = err.length;
 
-            const tbody = document.getElementById('tabla-registros');
-            tbody.innerHTML = '';
+            const tbody = document.getElementById('tabla-registros'); tbody.innerHTML = '';
             document.getElementById('tabla-vacia').className = lecturas.length === 0 ? "text-center py-8 text-slate-400 text-xs" : "hidden";
-
-            let acumulado = 0;
+            
+            let acu = 0;
             lecturas.forEach(lec => {
-                acumulado += lec.kwh;
-                const costAcum = calcularFactura(acumulado, edeSeleccionada).costoTotal;
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50/80 transition-colors";
-                tr.innerHTML = `
-                    <td class="py-3 px-3 font-semibold text-slate-700">${lec.fecha.split('-')[2]}/${lec.fecha.split('-')[1]}</td>
+                acu += lec.kwh; const ca = calcularFactura(acu, edeSeleccionada).costoTotal;
+                const tr = document.createElement('tr'); tr.className = "hover:bg-slate-50/80 transition-colors";
+                tr.innerHTML = `<td class="py-3 px-3 font-semibold text-slate-700">${lec.fecha.split('-')[2]}/${lec.fecha.split('-')[1]}</td>
                     <td class="py-3 px-3 text-right">${lec.esFallo ? '<span class="text-amber-500 italic font-medium">Fallo</span>' : '<strong>'+lec.kwh.toFixed(2)+' kWh</strong>'}</td>
-                    <td class="py-3 px-3 text-right font-mono text-slate-800">RD$ ${costAcum.toFixed(2)}</td>
-                    <td class="py-3 px-3 text-center">
-                        <button onclick="eliminarRegistro('${lec.fecha}')" class="text-slate-300 hover:text-rose-500 p-1 rounded-full hover:bg-rose-50 transition-all">
-                            <i data-lucide="trash-2" class="w-4 h-4"></i>
-                        </button>
-                    </td>
-                `;
+                    <td class="py-3 px-3 text-right font-mono text-slate-800">RD$ ${ca.toFixed(2)}</td>
+                    <td class="py-3 px-3 text-center"><button onclick="window.eliminarRegistro('${lec.fecha}')" class="text-slate-300 hover:text-rose-500 p-1 rounded-full"><i data-lucide="trash-2" class="w-4 h-4"></i></button></td>`;
                 tbody.appendChild(tr);
             });
 
-            const cG = document.getElementById('grafica-contenedor');
-            cG.innerHTML = '';
-
-            if (paraGrafica.length > 0) {
-                const maxVal = Math.max(...paraGrafica.map(l => l.kwh), 15);
-                
-                paraGrafica.forEach(l => {
-                    const p = l.fecha.split('-');
-                    const formattedDate = `${p[2]}/${p[1]}`;
-                    const col = document.createElement('div');
-                    col.className = "flex flex-col items-center gap-2 min-w-[45px] cursor-pointer group";
-                    
+            const cG = document.getElementById('grafica-contenedor'); cG.innerHTML = '';
+            if (paraGraf.length > 0) {
+                const mxV = Math.max(...paraGraf.map(l => l.kwh), 15);
+                paraGraf.forEach(l => {
+                    const fD = `${l.fecha.split('-')[2]}/${l.fecha.split('-')[1]}`;
+                    const c = document.createElement('div'); c.className = "flex flex-col items-center gap-2 min-w-[45px] cursor-pointer group";
                     if (l.esFallo) {
-                        col.innerHTML = `
-                            <span class="text-[10px] font-extrabold text-amber-500">--</span>
-                            <div class="w-8 bg-amber-50 border border-dashed border-amber-300 rounded-t-xl h-6 flex items-center justify-center text-amber-500">
-                                <i data-lucide="cloud-off" class="w-3.5 h-3.5"></i>
-                            </div>
-                            <div class="w-full border-t border-slate-200"></div>
-                            <span class="text-[10px] font-bold text-slate-400 tracking-tight">${formattedDate}</span>
-                        `;
+                        c.innerHTML = `<span class="text-[10px] font-extrabold text-amber-500">--</span><div class="w-8 bg-amber-50 border border-dashed border-amber-300 rounded-t-xl h-6 flex items-center justify-center text-amber-500"><i data-lucide="cloud-off" class="w-3.5 h-3.5"></i></div><div class="w-full border-t border-slate-200"></div><span class="text-[10px] font-bold text-slate-400">${fD}</span>`;
                     } else {
-                        const calcHeight = (l.kwh / maxVal) * 110;
-                        const finalHeight = Math.max(calcHeight, 8);
-                        
-                        col.innerHTML = `
-                            <span class="text-[10.5px] font-black text-[#0284c7] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all">${l.kwh.toFixed(2)}</span>
-                            <div class="w-8 bg-sky-400 rounded-t-xl hover:bg-sky-500 transition-all bar-transition" style="height: ${finalHeight}px"></div>
-                            <div class="w-full border-t border-slate-200"></div>
-                            <span class="text-[10px] font-bold text-slate-400 tracking-tight">${formattedDate}</span>
-                        `;
+                        const h = Math.max((l.kwh / mxV) * 110, 8);
+                        c.innerHTML = `<span class="text-[10.5px] font-black text-[#0284c7] opacity-90 group-hover:opacity-100 group-hover:scale-105 transition-all">${l.kwh.toFixed(2)}</span><div class="w-8 bg-sky-400 rounded-t-xl hover:bg-sky-500 transition-all bar-transition" style="height: ${h}px"></div><div class="w-full border-t border-slate-200"></div><span class="text-[10px] font-bold text-slate-400">${fD}</span>`;
                     }
-                    cG.appendChild(col);
+                    cG.appendChild(c);
                 });
-            } else {
-                cG.innerHTML = `<div class="w-full text-center py-10 text-slate-400 text-xs font-semibold">No hay lecturas registradas para graficar.</div>`;
-            }
+            } else { cG.innerHTML = `<div class="w-full text-center py-10 text-slate-400 text-xs font-semibold">No hay lecturas registradas.</div>`; }
 
             renderizarSeccionGuardados();
             lucide.createIcons();
         }
 
-        function mostrarAlertaRapida(msg) {
-            const viejos = document.querySelectorAll('.app-toast');
-            viejos.forEach(v => v.remove());
+        window.confirmarReseteo = function() {
+            abrirConfirmacion('¿Borrar TODO en la Nube?', 'Esto eliminará permanentemente TODOS tus datos, historiales y configuraciones de la base de datos central.', 'bg-rose-500 hover:bg-rose-600', 'alert-octagon',
+                async function() {
+                    if (userId) {
+                        const collections = ['lecturas_activas', 'historial_lecturas', 'calculos_guardados', 'config'];
+                        for (let col of collections) {
+                            const sn = await getDocs(collection(db, 'artifacts', appId, 'users', userId, col));
+                            sn.forEach(d => deleteDoc(d.ref));
+                        }
+                    }
+                    lecturas = []; historialBackup = []; calculosGuardados = []; edeSeleccionada = 'edenorte';
+                    renderizarApp();
+                    mostrarAlertaRapida('Base de datos y aplicación restablecida a 0.');
+                }
+            );
+        }
 
+        // UTILIDADES Y MODALES
+        window.cerrarModalConfirmacion = function() { document.getElementById('modal-confirmacion').classList.add('hidden'); callbackConfirmacion = null; }
+        document.getElementById('confirm-btn-proceder').onclick = function() { if(callbackConfirmacion) callbackConfirmacion(); window.cerrarModalConfirmacion(); }
+
+        function abrirConfirmacion(tit, desc, col, icon, cb) {
+            document.getElementById('confirm-titulo').innerText = tit; document.getElementById('confirm-descripcion').innerText = desc;
+            const btn = document.getElementById('confirm-btn-proceder');
+            if (modoSeleccionMultiple && idsSeleccionados.length>0 && cb===ejecutarEliminarLote) { btn.onclick = function() { ejecutarEliminarLote(); window.cerrarModalConfirmacion(); }; }
+            else { btn.onclick = function() { if(cb) cb(); window.cerrarModalConfirmacion(); }; }
+            btn.className = `w-full text-white py-2.5 rounded-xl text-xs font-bold transition-colors ${col}`;
+            const wrp = document.getElementById('confirm-icon-wrapper'), iEl = document.getElementById('confirm-icon');
+            if(col.includes('rose')){ wrp.className="mx-auto w-12 h-12 bg-rose-50 text-rose-500 rounded-full flex items-center justify-center mb-2"; iEl.setAttribute('data-lucide', 'alert-octagon'); }
+            else if(col.includes('emerald')){ wrp.className="mx-auto w-12 h-12 bg-emerald-50 text-emerald-500 rounded-full flex items-center justify-center mb-2"; iEl.setAttribute('data-lucide', 'check-circle-2'); }
+            else { wrp.className="mx-auto w-12 h-12 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mb-2"; iEl.setAttribute('data-lucide', 'alert-triangle'); }
+            if(icon) iEl.setAttribute('data-lucide', icon);
+            lucide.createIcons(); callbackConfirmacion = cb;
+            document.getElementById('modal-confirmacion').classList.remove('hidden');
+        }
+
+        document.getElementById('btn-multiple-select').onclick = function() {
+            if (modoSeleccionMultiple && idsSeleccionados.length > 0) ejecutarEliminarLote(); else window.toggleSeleccionMultiple();
+        };
+
+        function mostrarAlertaRapida(msg) {
+            document.querySelectorAll('.app-toast').forEach(v => v.remove());
             const div = document.createElement('div');
             div.className = "app-toast fixed bottom-24 left-1/2 -translate-x-1/2 bg-slate-900/95 backdrop-blur-xs text-white text-xs px-4 py-2.5 rounded-full shadow-2xl z-50 transition-all duration-300 opacity-0 transform translate-y-2 font-medium flex items-center gap-2 border border-slate-700/50";
             div.innerHTML = `<span class="w-1.5 h-1.5 bg-sky-400 rounded-full animate-ping"></span> ${msg}`;
             document.body.appendChild(div);
-            
-            setTimeout(() => {
-                div.classList.remove('opacity-0', 'translate-y-2');
-                div.classList.add('opacity-100', 'translate-y-0');
-            }, 50);
-
-            setTimeout(() => {
-                div.classList.remove('opacity-100', 'translate-y-0');
-                div.classList.add('opacity-0', 'translate-y-2');
-                setTimeout(() => div.remove(), 300);
-            }, 2300);
+            setTimeout(() => { div.classList.remove('opacity-0', 'translate-y-2'); div.classList.add('opacity-100', 'translate-y-0'); }, 50);
+            setTimeout(() => { div.classList.remove('opacity-100', 'translate-y-0'); div.classList.add('opacity-0', 'translate-y-2'); setTimeout(() => div.remove(), 300); }, 2300);
         }
 
         function actualizarContadorFacturacion() {
-            const hoy = new Date();
-            const diaCorte = 3;
+            const hoy = new Date(); const diaCorte = 3;
             let proximoCorte = new Date(hoy.getFullYear(), hoy.getMonth(), diaCorte);
-
-            if (hoy.getDate() >= diaCorte) {
-                proximoCorte.setMonth(proximoCorte.getMonth() + 1);
-            }
-
-            const diferenciaTiempo = proximoCorte - hoy;
-            const diasRestantes = Math.ceil(diferenciaTiempo / (1000 * 60 * 60 * 24));
-            
-            const elemento = document.getElementById('contador-facturacion');
-            if (elemento) {
-                elemento.innerText = diasRestantes === 0 ? "¡Corte de Facturación Hoy!" : `Faltan ${diasRestantes} días para el corte`;
-            }
+            if (hoy.getDate() >= diaCorte) proximoCorte.setMonth(proximoCorte.getMonth() + 1);
+            const diasRestantes = Math.ceil((proximoCorte - hoy) / (1000 * 60 * 60 * 24));
+            const el = document.getElementById('contador-facturacion');
+            if (el) el.innerText = diasRestantes === 0 ? "¡Corte de Facturación Hoy!" : `Faltan ${diasRestantes} días para el corte`;
         }
+
+        // ARRANCAR APLICACIÓN
+        window.addEventListener('DOMContentLoaded', () => {
+            const hoy = new Date();
+            document.getElementById('input-fecha').value = hoy.toISOString().split('T')[0];
+            initApp();
+        });
+
     </script>
 </body>
 </html>
+
 
